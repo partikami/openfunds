@@ -167,7 +167,7 @@ export default function Record() {
                 OFID
               </label>
               <div className="box-border min-w-fit">
-                <div className="flex rounded-md bg-white shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                <div className="flex rounded-md bg-white shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                   <input
                     type="text"
                     name="ofid"
@@ -211,7 +211,7 @@ export default function Record() {
                 Data Type
               </label>
               <div className="box-border min-w-fit">
-                <div className="flex rounded-md bg-white shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                <div className="flex rounded-md bg-white shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                   <input
                     type="text"
                     name="dataType"
@@ -255,7 +255,7 @@ export default function Record() {
                 Level
               </label>
               <div className="box-border min-w-fit">
-                <div className="flex rounded-md bg-white shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                <div className="flex rounded-md bg-white shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                   <input
                     type="text"
                     name="level"
@@ -299,7 +299,7 @@ export default function Record() {
                 Link Reference
               </label>
               <div className="box-border min-w-fit">
-                <div className="flex rounded-md bg-white shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                <div className="flex rounded-md bg-white shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                   <input
                     type="text"
                     name="linkReference"
