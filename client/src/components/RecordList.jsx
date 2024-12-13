@@ -35,22 +35,47 @@ const RecordList = () => {
       header: "Type",
       size: 150,
     }),
-    columnHelper.accessor("example", {
+    columnHelper.accessor("level", {
       cell: (info) => <span>{info.getValue()}</span>,
-      header: "Example",
-      size: 120,
+      header: "Level",
+      size: 400,
     }),
     columnHelper.accessor("tags", {
       cell: (info) => <span>{info.getValue()}</span>,
       header: "Tags",
       size: 400,
     }),
+    columnHelper.accessor("linkReference", {
+      cell: (info) => <span>{info.getValue()}</span>,
+      header: "Reference",
+      size: 400,
+    }),
+    columnHelper.accessor("introduced", {
+      cell: (info) => <span>{info.getValue()}</span>,
+      header: "In",
+      size: 400,
+    }),
+    columnHelper.accessor("depricated", {
+      cell: (info) => <span>{info.getValue()}</span>,
+      header: "Out",
+      size: 400,
+    }),
+    columnHelper.accessor("values", {
+      cell: (info) => <span>{info.getValue()}</span>,
+      header: "Values",
+      size: 120,
+    }),
+    columnHelper.accessor("example", {
+      cell: (info) => <span>{info.getValue()}</span>,
+      header: "Example",
+      size: 120,
+    }),
     columnHelper.display({
       id: "actions",
       header: (
         <NavLink
-          className="text-white bg-green-700 hover:bg-green-800 border-none 
-    focus:outline-none focus:ring-2 focus:ring-blue600 font-normal rounded-lg text-sm px-3 py-0.2 mb-0 me-0"
+        className="text-white bg-green-700 hover:bg-green-800 border-none 
+        focus:outline-none focus:ring-2 focus:ring-blue600 font-normal rounded-lg text-sm px-3 py-0.2 mb-0 me-0"
           to="/create"
         >
           New
@@ -65,7 +90,6 @@ const RecordList = () => {
     const navigate = useNavigate();
 
     const handleEdit = () => {
-      // navigate(`/edit/${row.original._id}`);
       navigate(`/edit/${row.original._id}`);
     };
 
@@ -117,7 +141,7 @@ const RecordList = () => {
 
   return (
     <>
-      <div className="p-2 max-w-5xl mx-auto text-black fill-gray-600">
+      <div className="p-2 mx-auto text-black fill-gray-600">
         <div className="flex justify-between mb-2">
           <div className="w-full flex items-center gap-1">
             <SearchIcon />
@@ -137,19 +161,16 @@ const RecordList = () => {
               <div>
                 {/* <table className="border border-gray-700 w-screen text-left"> */}
                 <table className="min-w-full text-left">
-                  <thead className="bg-slate-500">
+                  <thead className="bg-cyan-900 text-white">
                     {table.getHeaderGroups().map((headerGroup) => (
                       <tr key={headerGroup.id}>
                         {headerGroup.headers.map((header) => (
                           <th
                             key={header.id}
-                            /* className={
-                              (header.id === "tags"
-                                ? `hidden lg:table-cell`
-                                : "") + `  px-3.5 py-2 lg:px-6 xl:px-8`
-                            } */
-                            className={`px-3.5 py-2 lg:px-6 xl:px-8 ${
-                              header.id === "tags" ? "hidden lg:table-cell" : ""
+                            className={`px-3.5 py-3 lg:px-6 xl:px-8 ${
+                              header.id === "tags" || header.id === "linkReference" ? "hidden xl:table-cell" : ""
+                            } ${
+                              header.id === "values" ? "hidden 2xl:table-cell" : ""
                             }`}
                           >
                             {flexRender(
@@ -174,8 +195,12 @@ const RecordList = () => {
                             <td
                               key={cell.id}
                               className={`px-3.5 py-2 lg:px-6 xl:px-8 ${
-                                cell.id.slice(-4) === "tags"
-                                  ? "hidden lg:table-cell"
+                                cell.id.slice(-4) === "tags" || cell.id.slice(-13) === "linkReference"
+                                  ? "hidden xl:table-cell"
+                                  : ""
+                              } ${
+                                cell.id.slice(-6) === "values"
+                                  ? "hidden 2xl:table-cell"
                                   : ""
                               }`}
                             >
@@ -203,6 +228,16 @@ const RecordList = () => {
 
         {/* pagination */}
         <div className="flex items-center justify-end mt-2 gap-2">
+
+          <button
+            onClick={() => {
+              table.firstPage();
+            }}
+            disabled={!table.getCanPreviousPage()}
+            className="p-1 border border-gray-300 px-2 disabled:opacity-30"
+          >
+            {"<<"}
+          </button>
           <button
             onClick={() => {
               table.previousPage();
@@ -221,7 +256,15 @@ const RecordList = () => {
           >
             {">"}
           </button>
-
+          <button
+            onClick={() => {
+              table.lastPage();
+            }}
+            disabled={!table.getCanNextPage()}
+            className="p-1 border border-gray-300 px-2 disabled:opacity-30"
+          >
+            {">>"}
+          </button>
           <span className="flex items-center gap-1">
             <div>Page</div>
             <strong>
@@ -248,7 +291,7 @@ const RecordList = () => {
             }}
             className="p-2 bg-transparent"
           >
-            {[10, 30, 50, 100].map((pageSize) => (
+            {[10, 25, 50, 100].map((pageSize) => (
               <option key={pageSize} value={pageSize}>
                 Show {pageSize}
               </option>
