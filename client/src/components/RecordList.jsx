@@ -20,6 +20,20 @@ const RecordList = () => {
       header: "_id",
       size: 120,
     }), */
+    columnHelper.display({
+      id: "actions",
+      header: (
+        <NavLink
+          className="text-white bg-green-700 hover:bg-green-800 border-none 
+        focus:outline-none focus:ring-2 focus:ring-blue600 font-normal rounded-lg text-sm px-3 py-0.2 mb-0 me-0"
+          to="/create"
+        >
+          New
+        </NavLink>
+      ),
+      cell: ({ row }) => <EditButton row={row} />,
+      size: 100,
+    }),
     columnHelper.accessor("ofid", {
       cell: (info) => <span>{info.getValue()}</span>,
       header: "OFID",
@@ -69,20 +83,6 @@ const RecordList = () => {
       cell: (info) => <span>{info.getValue()}</span>,
       header: "Example",
       size: 120,
-    }),
-    columnHelper.display({
-      id: "actions",
-      header: (
-        <NavLink
-        className="text-white bg-green-700 hover:bg-green-800 border-none 
-        focus:outline-none focus:ring-2 focus:ring-blue600 font-normal rounded-lg text-sm px-3 py-0.2 mb-0 me-0"
-          to="/create"
-        >
-          New
-        </NavLink>
-      ),
-      cell: ({ row }) => <EditButton row={row} />,
-      size: 100,
     }),
   ];
 
@@ -143,13 +143,13 @@ const RecordList = () => {
     <>
       <div className="p-2 mx-auto text-black fill-gray-600">
         <div className="flex justify-between mb-2">
-          <div className="w-full flex items-center gap-1">
+          <div className="pt-12 w-full flex items-center gap-1">
             <SearchIcon />
             <DebouncedInput
               value={globalFilter ?? ""}
               onChange={(value) => setGlobalFilter(String(value))}
-              className="p-2 bg-transparent outline-none border-b-2 w-1/5 focus:w-1/3 duration-300 border-gray-600"
-              placeholder="Search all columns..."
+              className="bg-transparent outline-none border-b-2 w-1/5 focus:w-1/3 duration-300 border-gray-600"
+              placeholder="Search ..."
             />
           </div>
           {/* <DownloadBtn data={data} fileName={"peoples"} /> */}
@@ -159,7 +159,6 @@ const RecordList = () => {
           <div className="overflow-x-auto">
             <div className="inline-block min-w-full py-2 align-middle">
               <div>
-                {/* <table className="border border-gray-700 w-screen text-left"> */}
                 <table className="min-w-full text-left">
                   <thead className="bg-cyan-900 text-white">
                     {table.getHeaderGroups().map((headerGroup) => (
@@ -167,10 +166,28 @@ const RecordList = () => {
                         {headerGroup.headers.map((header) => (
                           <th
                             key={header.id}
-                            className={`px-3.5 py-3 lg:px-6 xl:px-8 ${
-                              header.id === "tags" || header.id === "linkReference" ? "hidden xl:table-cell" : ""
+                            className={`py-2 px-2 ${
+                              header.id === "introduced"
+                                ? "hidden sm:table-cell"
+                                : ""
                             } ${
-                              header.id === "values" ? "hidden 2xl:table-cell" : ""
+                              header.id === "example"
+                                ? "hidden md:table-cell"
+                                : ""
+                            } ${
+                              header.id === "level"
+                                ? "hidden lg:table-cell"
+                                : ""
+                            } ${
+                              header.id === "tags" ||
+                              header.id === "linkReference"
+                                ? "hidden xl:table-cell"
+                                : ""
+                            } ${
+                              header.id.slice(-10) === "depricated" ||
+                              header.id === "values"
+                                ? "hidden 2xl:table-cell"
+                                : ""
                             }`}
                           >
                             {flexRender(
@@ -194,11 +211,25 @@ const RecordList = () => {
                           {row.getVisibleCells().map((cell) => (
                             <td
                               key={cell.id}
-                              className={`px-3.5 py-2 lg:px-6 xl:px-8 ${
-                                cell.id.slice(-4) === "tags" || cell.id.slice(-13) === "linkReference"
+                              className={`py-1 px-2 ${
+                                cell.id.slice(-10) === "introduced"
+                                  ? "hidden sm:table-cell"
+                                  : ""
+                              } ${
+                                cell.id.slice(-7) === "example"
+                                  ? "hidden md:table-cell"
+                                  : ""
+                              } ${
+                                cell.id.slice(-5) === "level"
+                                  ? "hidden lg:table-cell"
+                                  : ""
+                              } ${
+                                cell.id.slice(-4) === "tags" ||
+                                cell.id.slice(-13) === "linkReference"
                                   ? "hidden xl:table-cell"
                                   : ""
                               } ${
+                                cell.id.slice(-10) === "depricated" ||
                                 cell.id.slice(-6) === "values"
                                   ? "hidden 2xl:table-cell"
                                   : ""
@@ -228,7 +259,6 @@ const RecordList = () => {
 
         {/* pagination */}
         <div className="flex items-center justify-end mt-2 gap-2">
-
           <button
             onClick={() => {
               table.firstPage();
@@ -266,7 +296,9 @@ const RecordList = () => {
             {">>"}
           </button>
           <span className="flex items-center gap-1">
-            <div>Page</div>
+            <div>
+              <span className="flex items-center gap-1"></span>{" "}
+            </div>
             <strong>
               {table.getState().pagination.pageIndex + 1} of{" "}
               {table.getPageCount()}
@@ -281,7 +313,7 @@ const RecordList = () => {
                 const page = e.target.value ? Number(e.target.value) - 1 : 0;
                 table.setPageIndex(page);
               }}
-              className="border p-1 rounded w-16 bg-transparent"
+              className="border p-1 text-right rounded w-16 bg-transparent"
             />
           </span>
           <select
