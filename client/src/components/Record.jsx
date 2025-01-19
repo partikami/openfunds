@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, NavLink } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 
 export default function Record() {
   const [form, setForm] = useState({
@@ -114,7 +114,7 @@ export default function Record() {
         introduced: "",
         depricated: "",
       });
-      navigate("/");
+      navigate("/list");
     }
   }
 
@@ -403,7 +403,8 @@ export default function Record() {
         </div>
         <div className="flow-root">
           <div className="float-left">
-            <Link className="mr-4 inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 hover:text-accent-foreground h-9 rounded-md px-3 cursor-pointer mt-4"
+            <Link
+              className="mr-4 inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 hover:text-accent-foreground h-9 rounded-md px-3 cursor-pointer mt-4"
               to="/list"
             >
               Cancel

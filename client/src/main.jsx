@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App.jsx";
 import Record from "./components/Record";
 import RecordList from "./components/RecordList";
+import Welcome from "./components/Welcome";
 import "./index.css";
 
 const router = createBrowserRouter([
@@ -13,6 +14,16 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
+        element: <Welcome />,
+      },
+    ],
+  },
+  {
+    path: "/list",
+    element: <App />,
+    children: [
+      {
+        path: "/list",
         element: <RecordList />,
       },
     ],

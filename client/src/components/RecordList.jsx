@@ -9,7 +9,7 @@ import {
 import { useEffect, useState } from "react";
 import DebouncedInput from "./DebouncedInput";
 import { SearchIcon } from "../Icons/Icons";
-import { useNavigate, NavLink } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const RecordList = () => {
   const columnHelper = createColumnHelper();
@@ -23,13 +23,13 @@ const RecordList = () => {
     columnHelper.display({
       id: "actions",
       header: (
-        <NavLink
+        <Link
           className="text-white bg-green-700 hover:bg-green-800 border-none 
         focus:outline-none focus:ring-2 focus:ring-blue600 font-normal rounded-lg text-sm px-3 py-0.2 mb-0 me-0"
           to="/create"
         >
           New
-        </NavLink>
+        </Link>
       ),
       cell: ({ row }) => <EditButton row={row} />,
       size: 100,
