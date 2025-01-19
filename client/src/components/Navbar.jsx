@@ -4,13 +4,17 @@ import { NavLink } from "react-router-dom";
 export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const buttonClasses =
+  const navLinkClasses =
     "text-gray-100 font-bold text-sm px-2 py-1 border-2 border-gray-100 hover:bg-gray-100 hover:text-gray-800 rounded-lg transition duration-300";
   const buttons = (
     <>
-      <button className={buttonClasses}>Home</button>
-      <button className={buttonClasses}>Library</button>
-      <button className={buttonClasses}>Login</button>
+      <NavLink className={navLinkClasses} to="/">
+        Home
+      </NavLink>
+      <NavLink className={navLinkClasses} to="/list">
+        Library
+      </NavLink>
+      <NavLink className={navLinkClasses}>Login</NavLink>
     </>
   );
 
@@ -45,8 +49,8 @@ export default function NavBar() {
               >
                 <path
                   stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeWidth="2"
                   d="M5 7h14M5 12h14M5 17h14"
                 />
               </svg>
