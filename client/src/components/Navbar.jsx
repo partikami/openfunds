@@ -6,15 +6,34 @@ export default function NavBar() {
 
   const navLinkClasses =
     "text-gray-100 font-bold text-sm px-2 py-1 border-2 border-gray-100 hover:bg-gray-100 hover:text-gray-800 rounded-lg transition duration-300";
+  const navLinkClassesActive =
+    "text-gray-100 font-bold text-sm px-2 py-1 border-2 border-gray-900 bg-gray-100 text-gray-800 rounded-lg transition duration-300";
   const buttons = (
     <>
-      <NavLink className={navLinkClasses} to="/">
+      <NavLink
+        className={({ isActive }) =>
+          isActive ? navLinkClassesActive : navLinkClasses
+        }
+        to="/"
+      >
         Home
       </NavLink>
-      <NavLink className={navLinkClasses} to="/list">
+      <NavLink
+        className={({ isActive }) =>
+          isActive ? navLinkClassesActive : navLinkClasses
+        }
+        to="/list"
+      >
         Library
       </NavLink>
-      <NavLink className={navLinkClasses}>Login</NavLink>
+      <NavLink
+        className={({ isActive }) =>
+          isActive ? navLinkClassesActive : navLinkClasses
+        }
+        to="/login"
+      >
+        Login
+      </NavLink>
     </>
   );
 
