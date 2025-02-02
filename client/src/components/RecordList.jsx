@@ -9,7 +9,7 @@ import {
 import { useEffect, useState } from "react";
 import DebouncedInput from "./DebouncedInput";
 import { SearchIcon } from "../Icons/Icons";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLoaderData, Link, json } from "react-router-dom";
 
 const RecordList = () => {
   const columnHelper = createColumnHelper();
@@ -105,7 +105,7 @@ const RecordList = () => {
     );
   };
 
-  const [data, setData] = useState([]);
+  /* const [data, setData] = useState([]);
 
   // This method fetches the records from the database
   useEffect(() => {
@@ -123,7 +123,14 @@ const RecordList = () => {
     };
 
     fetchData();
-  }, []);
+  }, []); */
+
+  // This retrieves all records from the database
+  const data = useLoaderData();
+
+  /* if (data.isError) {
+    return <p>{data.message}</p>;
+  } */
 
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -336,3 +343,18 @@ const RecordList = () => {
 };
 
 export default RecordList;
+
+// This function is used in the client's router main.jsx
+export async function recordListLoader() {
+  const response = await fetch("http://localhost:5050/record");
+
+  if (!response.ok) {
+    // return {isError: true, message: 'Could not fetch data.'};
+    // throw { message: "Could not fetch data." };
+    // throw new Response(JSON.stringify({ message: 'From RecordList: Could not fetch data.' }), { status: 500 });
+    // throw new Response(JSON.stringify({ message: 'From RecordList: Could not fetch data.' }), { status: 500 });
+    throw json({ message: 'From RecordList: Could not fetch data.'}, { status: 500 });
+  } else {
+    return response;
+  }
+}

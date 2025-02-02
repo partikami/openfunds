@@ -1,9 +1,31 @@
+import { useRouteError } from "react-router-dom";
+import Navbar from "./Navbar";
+
 function Error() {
+  const error = useRouteError();
+
+  let title = "An error occured!";
+  let message =
+    "You must be kidding. I do not make errors! And btw could you be a little more specific, please.";
+
+  if (error.status === 500) {
+    // message = JSON.parse(error.data).message;
+    message = error.data.message;
+  }
+
+  if (error.status === 404) {
+    title = "Not found!";
+    message = "Could not find resource or page.";
+  }
+
   return (
     <>
-      <main className="mx-auto px-4 flex-col w-full justify-items-center bg-cyan-900">
-      <div className="text-4xl font-bold text-white">Error</div>
-      <div className="text-2xl text-gray-300">You must be kidding. I do not make errors!</div>
+      <main className="flex-col justify-items-center">
+        <div className="w-full p-6 bg-white">
+          <Navbar />
+        </div>
+        <div className="py-8 text-4xl font-bold text-black">{title}</div>
+        <div className="text-2xl text-black">{message}</div>
       </main>
     </>
   );

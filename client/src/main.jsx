@@ -3,10 +3,10 @@ import * as ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App.jsx";
 import Record from "./components/Record";
-import RecordList from "./components/RecordList";
+import RecordList, {recordListLoader} from "./components/RecordList";
 import Welcome from "./components/Welcome";
 import Login from "./components/Login";
-import Error from "./components/Error"
+import Error from "./components/Error";
 import "./index.css";
 
 const router = createBrowserRouter([
@@ -16,7 +16,7 @@ const router = createBrowserRouter([
     errorElement: <Error />,
     children: [
       { index: true, element: <Welcome /> },
-      { path: "/list", element: <RecordList /> },
+      { path: "/list", element: <RecordList />, loader: recordListLoader},
       { path: "/edit/:id", element: <Record /> },
       { path: "/create", element: <Record /> },
       { path: "/login", element: <Login /> },
