@@ -9,7 +9,7 @@ import {
 import { useEffect, useState } from "react";
 import DebouncedInput from "./DebouncedInput";
 import { SearchIcon } from "../Icons/Icons";
-import { useNavigate, useLoaderData, Link } from "react-router-dom";
+import { useNavigate, useLoaderData, Link } from "react-router";
 
 const RecordList = () => {
   const columnHelper = createColumnHelper();
