@@ -9,7 +9,7 @@ import {
 import { useEffect, useState } from "react";
 import DebouncedInput from "./DebouncedInput";
 import { SearchIcon } from "../Icons/Icons";
-import { useNavigate, useLoaderData, Link, json } from "react-router-dom";
+import { useNavigate, useLoaderData, Link } from "react-router-dom";
 
 const RecordList = () => {
   const columnHelper = createColumnHelper();
@@ -352,8 +352,8 @@ export async function recordListLoader() {
     // return {isError: true, message: 'Could not fetch data.'};
     // throw { message: "Could not fetch data." };
     // throw new Response(JSON.stringify({ message: 'From RecordList: Could not fetch data.' }), { status: 500 });
-    // throw new Response(JSON.stringify({ message: 'From RecordList: Could not fetch data.' }), { status: 500 });
-    throw json({ message: 'From RecordList: Could not fetch data.'}, { status: 500 });
+    // throw json({ message: 'From RecordList: Could not fetch data.'}, { status: 500 });
+    throw new Response(JSON.stringify({ message: 'Could not fetch data.' }), { status: 500 });
   } else {
     return response;
   }

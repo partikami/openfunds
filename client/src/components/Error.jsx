@@ -9,8 +9,7 @@ function Error() {
     "You must be kidding. I do not make errors! And btw could you be a little more specific, please.";
 
   if (error.status === 500) {
-    // message = JSON.parse(error.data).message;
-    message = error.data.message;
+    message = JSON.parse(error.data).message;
   }
 
   if (error.status === 404) {
