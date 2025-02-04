@@ -108,6 +108,8 @@ const RecordList = () => {
   /* const [data, setData] = useState([]);
 
   // This method fetches the records from the database
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -345,7 +347,7 @@ const RecordList = () => {
 export default RecordList;
 
 // This function is used in the client's router main.jsx
-export async function recordListLoader() {
+export async function loader() {
   const response = await fetch("http://localhost:5050/record");
 
   if (!response.ok) {
