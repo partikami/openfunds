@@ -1,16 +1,18 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
-import App from "./App.jsx";
+import App from "./layouts/App.jsx";
+import Fields from "./layouts/Fields.jsx";
 import Record from "./components/Record";
-// import Record, {loader as recordLoader} from "./components/Record";
 import RecordList, {
   loader as recordListLoader,
 } from "./components/RecordList";
-import Welcome from "./components/Welcome";
+import Home from "./components/Home.jsx";
 import Login from "./components/Login";
 import Error from "./components/Error";
 import "./index.css";
+
+import Dummy from "./components/Dummy.jsx";
 
 const router = createBrowserRouter([
   {
@@ -18,18 +20,19 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <Error />,
     children: [
-      { index: true, element: <Welcome /> },
+      { index: true, element: <Home /> },
+      { path: "/login", element: <Login /> },
       {
         path: "list",
-        element: <RecordList />,
-        loader: recordListLoader,
+        element: <Fields />,
+        // errorElement: <Error />,
         children: [
-          { path: "../:id", element: <Record /> },
-          { path: "../:id/edit", element: <Record /> },
-          { path: "../create", element: <Record /> },
+          { path: "", element: <RecordList />, loader: recordListLoader },
+          { path: ":id", element: <Record /> },
+          { path: ":id/edit", element: <Record /> },
+          { path: "create", element: <Record /> },
         ],
       },
-      // { path: "/login", element: <Login /> },
     ],
   },
 ]);

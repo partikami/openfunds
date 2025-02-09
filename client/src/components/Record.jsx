@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router";
+import { useParams, useNavigate, useLoaderData, Link } from "react-router";
 
 export default function Record() {
   const [form, setForm] = useState({
@@ -51,6 +51,9 @@ export default function Record() {
     fetchData();
     return;
   }, [params.id, navigate]);
+
+    // This retrieves the record from the database
+    // const data = useLoaderData();
 
   // These methods will update the state properties.
   function updateForm(value) {

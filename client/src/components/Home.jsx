@@ -1,6 +1,6 @@
 import React from "react";
 
-const Welcome =() => {
+const Home = () => {
   return (
     <div className="m-2">
       <h1>Welcome to the openfunds universe!</h1>
@@ -8,4 +8,4 @@ const Welcome =() => {
   );
 }
 
-export default Welcome;
+export default Home;

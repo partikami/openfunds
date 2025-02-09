@@ -6,7 +6,7 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DebouncedInput from "./DebouncedInput";
 import { SearchIcon } from "../Icons/Icons";
 import { useNavigate, useLoaderData, Link } from "react-router";
@@ -26,7 +26,7 @@ const RecordList = () => {
         <Link
           className="text-white bg-green-700 hover:bg-green-800 border-none 
         focus:outline-none focus:ring-2 focus:ring-blue600 font-normal rounded-lg text-sm px-3 py-0.2 mb-0 me-0"
-          to="/create"
+          to="create"
         >
           New
         </Link>
@@ -90,7 +90,7 @@ const RecordList = () => {
     const navigate = useNavigate();
 
     const handleEdit = () => {
-      navigate(`/edit/${row.original._id}`);
+      navigate(`${row.original._id}`);
     };
 
     return (
@@ -105,34 +105,8 @@ const RecordList = () => {
     );
   };
 
-  /* const [data, setData] = useState([]);
-
-  // This method fetches the records from the database
-
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("http://localhost:5050/record");
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const result = await response.json();
-        setData(result);
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      }
-    };
-
-    fetchData();
-  }, []); */
-
   // This retrieves all records from the database
   const data = useLoaderData();
-
-  /* if (data.isError) {
-    return <p>{data.message}</p>;
-  } */
 
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -304,7 +278,7 @@ const RecordList = () => {
           >
             {">>"}
           </button>
-          <span className="flex items-center gap-1">
+          {/* <span className="flex items-center gap-1">
             <div>
               <span className="flex items-center gap-1"></span>{" "}
             </div>
@@ -312,9 +286,9 @@ const RecordList = () => {
               {table.getState().pagination.pageIndex + 1} of{" "}
               {table.getPageCount()}
             </strong>
-          </span>
-          <span className="flex items-center gap-1">
-            | Go to page:
+          </span> */}
+          <span className="flex items-center gap-1 pl-2">
+            {/* | Go to: */}
             <input
               type="number"
               defaultValue={table.getState().pagination.pageIndex + 1}
@@ -322,8 +296,9 @@ const RecordList = () => {
                 const page = e.target.value ? Number(e.target.value) - 1 : 0;
                 table.setPageIndex(page);
               }}
-              className="border p-1 text-right rounded w-16 bg-transparent"
-            />
+              className="border p-1 text-right rounded w-12 bg-transparent"
+            />  of{" "}
+              {table.getPageCount()}
           </span>
           <select
             value={table.getState().pagination.pageSize}
@@ -351,11 +326,10 @@ export async function loader() {
   const response = await fetch("http://localhost:5050/record");
 
   if (!response.ok) {
-    // return {isError: true, message: 'Could not fetch data.'};
-    // throw { message: "Could not fetch data." };
-    // throw new Response(JSON.stringify({ message: 'From RecordList: Could not fetch data.' }), { status: 500 });
-    // throw json({ message: 'From RecordList: Could not fetch data.'}, { status: 500 });
-    throw new Response(JSON.stringify({ message: 'Could not fetch data.' }), { status: 500 });
+    throw new Response(
+      JSON.stringify({ message: "From RecordList: Could not fetch data." }),
+      { status: 500 }
+    );
   } else {
     return response;
   }
