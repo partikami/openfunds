@@ -1,0 +1,15 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[branch "main"]
+	vscode-merge-base = origin/main
+	vscode-merge-base = origin/main
+[branch "authentication"]
+	vscode-merge-base = origin/authentication
+[remote "origin"]
+	url = https://github.com/partikami/server.git
+	fetch = +refs/heads/*:refs/remotes/origin/*

@@ -1,0 +1,29 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "server module within a MERN stack",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --env-file=config.env server",
+    "dev": "nodemon --env-file=config.env server"
+  },
+  "keywords": [
+    "mern"
+  ],
+  "author": "michael partin",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
+    "mailtrap": "^4.0.0",
+    "mongodb": "^6.8.1",
+    "mongoose": "^8.13.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
