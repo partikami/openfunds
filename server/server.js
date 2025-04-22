@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 
-// import db from "./db/connection.js";
 import connectDB from "./db/connectDB.js";
 import recordRoutes from "./routes/record.route.js";
 import authRoutes from "./routes/auth.route.js";
