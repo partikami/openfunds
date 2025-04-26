@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 import connectDB from "./db/connectDB.js";
 import recordRoutes from "./routes/record.route.js";
@@ -21,6 +22,7 @@ app.use(
 );
 
 app.use(express.json()); // for parsing incoming JSON requests: req.body
+app.use(cookieParser()); // for parsing incoming cookies
 
 app.use("/record", recordRoutes);
 app.use("/auth", authRoutes);
