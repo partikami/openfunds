@@ -30,7 +30,7 @@ export default function NavBar() {
         className={({ isActive }) =>
           isActive ? navLinkClassesActive : navLinkClasses
         }
-        to="/auth?mode=login"
+        to="/auth"
       >
         Login
       </NavLink>

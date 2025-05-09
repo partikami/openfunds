@@ -12,10 +12,15 @@
   },
   "dependencies": {
     "@tanstack/react-table": "^8.20.5",
+    "axios": "^1.9.0",
+    "framer-motion": "^12.9.4",
+    "lucide-react": "^0.507.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.5.2",
     "react-router": "^7.1.5",
-    "serve": "^14.2.4"
+    "serve": "^14.2.4",
+    "zustand": "^5.0.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

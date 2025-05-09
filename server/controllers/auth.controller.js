@@ -41,7 +41,7 @@ export const signup = async (req, res) => {
     await user.save();
 
     // Generate a JWT token and set it in a cookie
-    const token = generateTokenAndSetCookie(res, user._id);
+    generateTokenAndSetCookie(res, user._id);
 
     // Send verification email
     await sendVerificationEmail(user.email, verificationToken);
@@ -80,6 +80,9 @@ export const login = async (req, res) => {
 
     user.lastLogin = new Date();
     await user.save();
+
+    // Generate a JWT token and set it in a cookie
+    generateTokenAndSetCookie(res, user._id);
 
     res.status(200).json({
       success: true,
@@ -214,7 +217,7 @@ export const checkAuth = async (req, res) => {
 
     res.status(200).json({ success: true, user });
   } catch (error) {
-    console.log("Error in CheckAuth", error);
+    console.log("Error in checkAuth ", error);
     res.status(400).json({ success: false, message: error.message });
   }
 };

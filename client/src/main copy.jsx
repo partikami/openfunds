@@ -64,7 +64,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       {
-        path: "auth",
+        path: "/auth",
         element: <Auth />,
         // errorElement: <Error />,
         children: [
@@ -78,11 +78,12 @@ const router = createBrowserRouter([
             element: <SignUpPage />,
           },
           { path: "verify", element: <EmailVerificationPage /> },
+
+          {
+            path: "dashboard",
+            element: <DashboardPage />,
+          },
         ],
-      },
-      {
-        path: "/dashboard",
-        element: <DashboardPage />,
       },
       {
         path: "list",
@@ -118,7 +119,6 @@ const router = createBrowserRouter([
   },
 ]);
 
-// Render the application
 ReactDOM.createRoot(document.getElementById("root")).render(
   // StrictMode only during development
   // <React.StrictMode>

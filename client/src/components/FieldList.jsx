@@ -106,7 +106,7 @@ const RecordList = () => {
     );
   }; */
 
-  // This gathers the records id and sends it to the react-router
+  // This gathers the record's id and sends it to the react-router
   const ShowButton = ({ row }) => {
     const _id = `${row.original._id}`;
 

@@ -6,15 +6,15 @@ function AuthForm() {
 
   return (
     <>
-      <Form method="post" className="">
-        <div className="">
+      <Form>
+        <div className="text-gray-100">
           <h1 className="flex justify-center text-2xl mt-14 mb-10 ">
             {isLogin ? "Log in" : "Create a new account"}
           </h1>
           <div className="flex flex-col justify-center max-w-2xl mx-auto">
             <div className="mb-2">
               <label
-                className="tracking-wide text-gray-700 text-lg font-bold"
+                className="tracking-wide text-gray-100 text-lg font-bold"
                 htmlFor="email"
               >
                 Email
@@ -36,7 +36,7 @@ function AuthForm() {
           <div className="flex flex-col justify-center max-w-2xl mx-auto">
             <div className="mb-2">
               <label
-                className="tracking-wide text-gray-700 text-lg font-bold"
+                className="tracking-wide text-gray-100 text-lg font-bold"
                 htmlFor="password"
               >
                 Password
@@ -55,8 +55,17 @@ function AuthForm() {
             </div>
           </div>
 
-          <div className="lex flex-col justify-center max-w-2xl mx-auto text-lg">
-            <div className="">
+          <div className="flex justify-end">
+            <button
+              type="button"
+              className="py-2 px-4 float-right text-center text-cyan-900 font-bold text-lg border-2 border-cyan-900 bg-white hover:bg-gray-300 hover:text-gray-800 rounded-lg transition duration-300"
+            >
+              {isLogin ? "Login" : "Sign up"}
+            </button>
+          </div>
+
+          <div className="flex flex-col justify-center max-w-2xl mx-auto text-lg">
+            <div className="mt-16">
               {isLogin
                 ? "Being here for the first time?"
                 : "Already having an account?"}
@@ -67,15 +76,6 @@ function AuthForm() {
               >
                 {isLogin ? "Signup" : "Login"}
               </Link>
-            </div>
-
-            <div className="">
-              <button
-                type="button"
-                className="py-2 px-4 float-right text-center text-cyan-900 font-bold text-lg border-2 border-cyan-900 bg-white hover:bg-gray-300 hover:text-gray-800 rounded-lg transition duration-300"
-              >
-                {isLogin ? "Login" : "Sign up"}
-              </button>
             </div>
           </div>
         </div>
