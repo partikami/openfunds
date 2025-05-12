@@ -11,6 +11,8 @@ import FieldCreatePage from "./pages/FieldCreatePage.jsx";
 import FieldDetailPage from "./pages/FieldDetailPage.jsx";
 import FieldEditPage from "./pages/FieldEditPage.jsx";
 import { useAuthStore } from "./store/authStore.js";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
 // import AuthenticationPage from "./pages/AuthenticationPage.jsx";
 
 import Home from "./components/Home.jsx";
@@ -25,7 +27,7 @@ import { loader as recordListLoader } from "./utilities/AllRecordsLoader.js";
 import { action as editAction } from "./utilities/EditAction.js";
 import { action as deleteAction } from "./utilities/DeleteAction.js";
 // import { action as authAction } from "./utilities/AuthAction.js";
-import EmailVerificationPage from "./pages/EmailVerificationPage.jsx";
+import VerifyEmailPage from "./pages/VerifyEmailPage.jsx";
 
 // Protect routes that require authentication
 const ProtectedRoute = ({ children }) => {
@@ -46,15 +48,15 @@ const ProtectedRoute = ({ children }) => {
 };
 
 // Redirect authenticated user to fields library
-/* const RedirectAuthenticatedUser = ({ children }) => {
+const RedirectAuthenticatedUser = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
 
   if (isAuthenticated && user.isVerified) {
-    return <Navigate to="/list" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return children;
-}; */
+};
 
 const router = createBrowserRouter([
   {
@@ -77,7 +79,15 @@ const router = createBrowserRouter([
             path: "signup",
             element: <SignUpPage />,
           },
-          { path: "verify", element: <EmailVerificationPage /> },
+          { path: "verify", element: <VerifyEmailPage /> },
+          {
+            path: "forgotPassword",
+            element: <ForgotPasswordPage />,
+          },
+          {
+            path: "reset-password/:token",
+            element: <ResetPasswordPage />,
+          },
         ],
       },
       {
@@ -121,8 +131,8 @@ const router = createBrowserRouter([
 // Render the application
 ReactDOM.createRoot(document.getElementById("root")).render(
   // StrictMode only during development
-  // <React.StrictMode>
-  <RouterProvider router={router} />
-  //  <Toaster />,
-  //</React.StrictMode>
+  <React.StrictMode>
+    <RouterProvider router={router} />
+    <Toaster />,
+  </React.StrictMode>
 );

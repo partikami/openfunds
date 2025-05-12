@@ -6,7 +6,7 @@ import { useAuthStore } from "../store/authStore";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 const App = () => {
-  const { isCheckingAuth, checkAuth, user } = useAuthStore();
+  const { isCheckingAuth, checkAuth } = useAuthStore();
 
   useEffect(() => {
     const fetchAuth = async () => {

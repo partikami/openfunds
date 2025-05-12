@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 
 import { useAuthStore } from "../store/authStore";
 
-const EmailVerificationPage = () => {
+const VerifyEmailPage = () => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
   const navigate = useNavigate();
@@ -109,4 +109,4 @@ const EmailVerificationPage = () => {
   );
 };
 
-export default EmailVerificationPage;
+export default VerifyEmailPage;
