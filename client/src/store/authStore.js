@@ -166,7 +166,7 @@ export const useAuthStore = create((set) => ({
         isCheckingAuth: false,
       });
     } catch (error) {
-      console.warn("Authentication check failed:", error.message);
+      // console.warn("Authentication check failed:", error.message);
       set({ error: null, isCheckingAuth: false, isAuthenticated: false });
     }
   },
