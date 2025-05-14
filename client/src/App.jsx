@@ -29,6 +29,8 @@ import { action as editAction } from "./utilities/EditAction.js";
 import { action as deleteAction } from "./utilities/DeleteAction.js";
 
 // Protect routes that require authentication
+
+/* 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
 
@@ -56,6 +58,7 @@ const RedirectAuthenticatedUser = ({ children }) => {
 
   return children;
 };
+ */
 
 const router = createBrowserRouter([
   {
@@ -134,14 +137,13 @@ const router = createBrowserRouter([
 ]);
 
 const App = () => {
-  const { isCheckingAuth, checkAuth } = useAuthStore();
+  const { isCheckingAuth, isAuthenticated, checkAuth } = useAuthStore();
 
   useEffect(() => {
-    const fetchAuth = async () => {
-      await checkAuth();
-    };
-    fetchAuth();
+    checkAuth();
   }, [checkAuth]);
+
+  console.log("isAuthenticated", isAuthenticated);
 
   if (isCheckingAuth) return <LoadingSpinner />;
 

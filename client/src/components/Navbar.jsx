@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { NavLink } from "react-router";
 
+import { useAuthStore } from "../store/authStore.js";
+
 export default function NavBar() {
+  const { isAuthenticated } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinkClasses =
@@ -32,7 +35,7 @@ export default function NavBar() {
         }
         to="/auth"
       >
-        Login
+        {isAuthenticated ? "Logout" : "Login"}
       </NavLink>
     </>
   );
