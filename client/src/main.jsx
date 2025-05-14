@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 
-import App from "./layouts/App.jsx";
+import App from "./App.jsx";
 import "./index.css";
 
 // Render the application

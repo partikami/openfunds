@@ -2,31 +2,31 @@ import { useEffect } from "react";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router";
 import { Toaster } from "react-hot-toast";
 
-import { useAuthStore } from "../store/authStore";
-import LoadingSpinner from "../components/LoadingSpinner";
+import { useAuthStore } from "./store/authStore.js";
+import LoadingSpinner from "./components/LoadingSpinner.jsx";
 
-import Auth from "./Auth.jsx";
-import Fields from "./Fields.jsx";
+import Auth from "./layouts/Auth.jsx";
+import Fields from "./layouts/Fields.jsx";
 
-import Navbar from "../components/Navbar";
-import Home from "../components/Home.jsx";
-import FieldList from "../components/FieldList.jsx";
-import Error from "../components/Error";
+import Navbar from "./components/Navbar.jsx";
+import Home from "./components/Home.jsx";
+import FieldList from "./components/FieldList.jsx";
+import Error from "./components/Error.jsx";
 
-import FieldCreatePage from "../pages/FieldCreatePage.jsx";
-import FieldDetailPage from "../pages/FieldDetailPage.jsx";
-import FieldEditPage from "../pages/FieldEditPage.jsx";
-import ForgotPasswordPage from "../pages/ForgotPasswordPage.jsx";
-import ResetPasswordPage from "../pages/ResetPasswordPage.jsx";
-import VerifyEmailPage from "../pages/VerifyEmailPage.jsx";
-import DashboardPage from "../pages/DashboardPage.jsx";
-import LoginPage from "../pages/LoginPage.jsx";
-import SignUpPage from "../pages/SignUpPage.jsx";
+import FieldCreatePage from "./pages/FieldCreatePage.jsx";
+import FieldDetailPage from "./pages/FieldDetailPage.jsx";
+import FieldEditPage from "./pages/FieldEditPage.jsx";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
+import VerifyEmailPage from "./pages/VerifyEmailPage.jsx";
+import DashboardPage from "./pages/DashboardPage.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import SignUpPage from "./pages/SignUpPage.jsx";
 
-import { loader as detailLoader } from "../utilities/DetailLoader.js";
-import { loader as recordListLoader } from "../utilities/AllRecordsLoader.js";
-import { action as editAction } from "../utilities/EditAction.js";
-import { action as deleteAction } from "../utilities/DeleteAction.js";
+import { loader as detailLoader } from "./utilities/DetailLoader.js";
+import { loader as recordListLoader } from "./utilities/AllRecordsLoader.js";
+import { action as editAction } from "./utilities/EditAction.js";
+import { action as deleteAction } from "./utilities/DeleteAction.js";
 
 // Protect routes that require authentication
 const ProtectedRoute = ({ children }) => {
