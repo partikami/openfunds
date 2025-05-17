@@ -177,9 +177,6 @@ export const resetPassword = async (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
 
-    console.log("Reset password token", token);
-    console.log("Reset password", password);
-
     const user = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() },
@@ -210,7 +207,6 @@ export const resetPassword = async (req, res) => {
 };
 
 export const checkAuth = async (req, res) => {
-  console.log("Checkauth");
   try {
     if (!req.authCheck) {
       // If authCheck is false, return an error response

@@ -2,34 +2,35 @@
 
 import { Link, Form } from "react-router";
 
+import { useAuthStore } from "../store/authStore";
+
 export default function FieldDetail({ method, field }) {
-  // const submit = useSubmit();
-
-  /*   function deleteHandler() {
-    const proceed = window.confirm("Are you sure?");
-
-    if (proceed) {
-      submit(null, { method: "delete" });
-    }
-  } */
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
     <article>
       <div className="flow-root mt-12 mb-12">
-        <Link
-          to="edit"
-          className="py-2 px-4 float-right text-center text-gray-100 font-bold text-lg border-2 border-black bg-cyan-900 hover:bg-cyan-800 hover:text-white rounded-lg transition duration-300"
-        >
-          Edit
-        </Link>
-        <Form method={method}>
-          <button
-            type="submit"
-            className="py-2 px-4 float-right mr-4 text-center text-gray-100 font-bold text-lg border-2 border-black bg-cyan-900 hover:bg-cyan-800 hover:text-white rounded-lg transition duration-300"
-          >
-            Delete
-          </button>
-        </Form>
+        {isAuthenticated ? (
+          <>
+            <Link
+              to="edit"
+              className="py-2 px-4 float-right text-center text-gray-100 font-bold text-lg border-2 border-black bg-cyan-900 hover:bg-cyan-800 hover:text-white rounded-lg transition duration-300"
+            >
+              Edit
+            </Link>
+            <Form method={method}>
+              <button
+                type="submit"
+                className="py-2 px-4 float-right mr-4 text-center text-gray-100 font-bold text-lg border-2 border-black bg-cyan-900 hover:bg-cyan-800 hover:text-white rounded-lg transition duration-300"
+              >
+                Delete
+              </button>
+            </Form>
+          </>
+        ) : (
+          <span></span>
+        )}
+
         <Link
           to=".."
           className="py-2 px-3 float-right mr-4 text-center text-cyan-900 font-bold text-lg border-2 border-cyan-900 bg-white hover:bg-gray-300 hover:text-gray-800 rounded-lg transition duration-300"
@@ -141,6 +142,46 @@ export default function FieldDetail({ method, field }) {
             {field.description}
           </div>
         </div>
+      </div>
+
+      {/* pagination */}
+      <div className="flex items-center justify-end mt-2 gap-2">
+        <button
+          onClick={() => {
+            // table.firstPage();
+          }}
+          //disabled={!table.getCanPreviousPage()}
+          className="p-1 border border-gray-300 px-2 disabled:opacity-30"
+        >
+          {"<<"}
+        </button>
+        <button
+          onClick={() => {
+            // table.previousPage();
+          }}
+          // disabled={!table.getCanPreviousPage()}
+          className="p-1 border border-gray-300 px-2 disabled:opacity-30"
+        >
+          {"<"}
+        </button>
+        <button
+          onClick={() => {
+            // table.nextPage();
+          }}
+          // disabled={!table.getCanNextPage()}
+          className="p-1 border border-gray-300 px-2 disabled:opacity-30"
+        >
+          {">"}
+        </button>
+        <button
+          onClick={() => {
+            // table.lastPage();
+          }}
+          //disabled={!table.getCanNextPage()}
+          className="p-1 border border-gray-300 px-2 disabled:opacity-30"
+        >
+          {">>"}
+        </button>
       </div>
     </article>
   );

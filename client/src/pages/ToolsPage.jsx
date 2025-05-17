@@ -1,6 +1,6 @@
-import FloatingShape from "./FloatingShape";
+import FloatingShape from "../components/FloatingShape";
 
-const Home = () => {
+const ToolsPage = () => {
   return (
     <div className="min-h-[800px] h-full bg-gradient-to-br from-cyan-900 via-cyan-800 to-cyan-900 flex items-center justify-center relative overflow-hidden">
       <FloatingShape
@@ -35,4 +35,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default ToolsPage;

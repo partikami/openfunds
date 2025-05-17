@@ -1,10 +1,19 @@
 import { useState } from "react";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 
 import { useAuthStore } from "../store/authStore.js";
 
-export default function NavBar() {
-  const { isAuthenticated } = useAuthStore();
+const NavBar = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const logout = useAuthStore((state) => state.logout);
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinkClasses =
@@ -33,7 +42,21 @@ export default function NavBar() {
         className={({ isActive }) =>
           isActive ? navLinkClassesActive : navLinkClasses
         }
-        to="/auth"
+        to="/tools"
+      >
+        Tools
+      </NavLink>
+
+      <NavLink
+        to={isAuthenticated ? "#" : "/auth"}
+        onClick={isAuthenticated ? handleLogout : undefined}
+        className={({ isActive }) => {
+          let classes = navLinkClasses;
+          if (isActive && !isAuthenticated) {
+            classes = navLinkClassesActive;
+          }
+          return classes;
+        }}
       >
         {isAuthenticated ? "Logout" : "Login"}
       </NavLink>
@@ -41,7 +64,7 @@ export default function NavBar() {
   );
 
   return (
-    <nav className="bg-cyan-900 border text-white">
+    <nav className="bg-gradient-to-r from-cyan-900 to-cyan-800 border text-white">
       <div className="mx-auto px-4 md:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex flex-row w-full justify-between">
@@ -89,4 +112,6 @@ export default function NavBar() {
       )}
     </nav>
   );
-}
+};
+
+export default NavBar;

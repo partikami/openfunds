@@ -1,5 +1,11 @@
 import { useEffect } from "react";
-import { createBrowserRouter, RouterProvider, Outlet } from "react-router";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Outlet,
+  Navigate,
+  useParams,
+} from "react-router";
 import { Toaster } from "react-hot-toast";
 
 import { useAuthStore } from "./store/authStore.js";
@@ -22,43 +28,34 @@ import VerifyEmailPage from "./pages/VerifyEmailPage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import SignUpPage from "./pages/SignUpPage.jsx";
+import ToolsPage from "./pages/ToolsPage.jsx";
 
 import { loader as detailLoader } from "./utilities/DetailLoader.js";
 import { loader as recordListLoader } from "./utilities/AllRecordsLoader.js";
 import { action as editAction } from "./utilities/EditAction.js";
 import { action as deleteAction } from "./utilities/DeleteAction.js";
+import { use } from "react";
 
 // Protect routes that require authentication
 
-/* 
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, user } = useAuthStore();
+const ProtectedEditRoute = ({ children }) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { id } = useParams();
 
   if (!isAuthenticated) {
-    // Redirect to login page if not authenticated
-    return <Navigate to="/auth" replace />;
+    return <Navigate to={`/list/${id}`} replace />;
   }
-
-  if (!user.isVerified) {
-    // Redirect to email verification page if not verified
-    return <Navigate to="/auth/verify" replace />;
-  }
-
-  // If authenticated and verified, render the children
   return children;
 };
 
-// Redirect authenticated user to fields library
-const RedirectAuthenticatedUser = ({ children }) => {
-  const { isAuthenticated, user } = useAuthStore();
+const ProtectedCreateRoute = ({ children }) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
-  if (isAuthenticated && user.isVerified) {
-    return <Navigate to="/" replace />;
+  if (!isAuthenticated) {
+    return <Navigate to="/list" replace />;
   }
-
   return children;
 };
- */
 
 const router = createBrowserRouter([
   {
@@ -107,7 +104,11 @@ const router = createBrowserRouter([
         element: <Fields />,
         // errorElement: <Error />,
         children: [
-          { path: "", element: <FieldList />, loader: recordListLoader },
+          {
+            path: "",
+            element: <FieldList />,
+            loader: recordListLoader,
+          },
           {
             path: ":id",
             id: "field-detail",
@@ -120,30 +121,42 @@ const router = createBrowserRouter([
               },
               {
                 path: "edit",
-                element: <FieldEditPage />,
+                element: (
+                  <ProtectedEditRoute>
+                    <FieldEditPage />
+                  </ProtectedEditRoute>
+                ),
                 action: editAction,
               },
             ],
           },
           {
             path: "create",
-            element: <FieldCreatePage />,
+            element: (
+              <ProtectedCreateRoute>
+                <FieldCreatePage />
+              </ProtectedCreateRoute>
+            ),
             action: editAction,
           },
         ],
+      },
+      {
+        path: "tools",
+        element: <ToolsPage />,
+        // errorElement: <Error />,
       },
     ],
   },
 ]);
 
 const App = () => {
-  const { isCheckingAuth, isAuthenticated, checkAuth } = useAuthStore();
+  const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth);
+  const checkAuth = useAuthStore((state) => state.checkAuth);
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
-
-  console.log("isAuthenticated", isAuthenticated);
 
   if (isCheckingAuth) return <LoadingSpinner />;
 

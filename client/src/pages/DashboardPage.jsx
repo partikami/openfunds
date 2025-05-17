@@ -10,8 +10,6 @@ const DashboardPage = () => {
   const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
 
-  console.log("user", user);
-
   const handleLogout = () => {
     logout();
     navigate("/");

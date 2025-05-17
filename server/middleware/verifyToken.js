@@ -4,7 +4,7 @@ export const verifyToken = (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
-    console.log("Unauthorized - no token provided");
+    // console.log("Unauthorized - no token provided");
     req.authCheck = false; // Set authCheck to false if no token is provided
     req.userId = null; // Set userId to null if no token is provided
     req.user = null; // Set user to null if no token is provided

@@ -12,25 +12,24 @@ import { useState } from "react";
 import DebouncedInput from "./DebouncedInput";
 import { SearchIcon } from "../Icons/Icons";
 import { useLoaderData, Link } from "react-router";
+import { useAuthStore } from "../store/authStore";
 
 const RecordList = () => {
   const columnHelper = createColumnHelper();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   const columns = [
-    /*     columnHelper.accessor("_id", {
-      cell: (info) => <span>{info.getValue()}</span>,
-      header: "_id",
-      size: 120,
-    }), */
     columnHelper.display({
       id: "actions",
-      header: (
+      header: isAuthenticated ? (
         <Link
           className="py-0 px-2 float-right mr-0 text-center text-cyan-900 font-bold text-lg border-2 border-gray-500 bg-gray-300 hover:bg-gray-500 hover:text-white rounded-lg transition duration-300"
           to="create"
         >
           New
         </Link>
+      ) : (
+        <span></span>
       ),
       cell: ({ row }) => <ShowButton row={row} />,
       size: 100,
