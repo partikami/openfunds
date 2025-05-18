@@ -9,8 +9,9 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useState } from "react";
+
 import DebouncedInput from "./DebouncedInput";
-import { SearchIcon } from "../Icons/Icons";
+import { SearchIcon, SortIcon } from "../Icons/Icons";
 import { useLoaderData, Link } from "react-router";
 import { useAuthStore } from "../store/authStore";
 
@@ -86,25 +87,6 @@ const RecordList = () => {
     }),
   ];
 
-  /* const ShowButton = ({ row }) => {
-    const navigate = useNavigate();
-
-    const handleEdit = () => {
-      navigate(`${row.original._id}/edit`);
-    };
-
-    return (
-      <button
-        onClick={handleEdit}
-        type="button"
-        className="text-white bg-blue-700 hover:bg-blue-800 border-none 
-    focus:outline-none focus:ring-2 focus:ring-blue600 font-normal rounded-lg text-sm px-3 py-0.2 mb-0 me-0"
-      >
-        Edit
-      </button>
-    );
-  }; */
-
   // This gathers the record's id and sends it to the react-router
   const ShowButton = ({ row }) => {
     const _id = `${row.original._id}`;
@@ -131,8 +113,9 @@ const RecordList = () => {
     state: {
       globalFilter,
     },
-    getFilteredRowModel: getFilteredRowModel(),
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
 
@@ -190,6 +173,66 @@ const RecordList = () => {
                               header.column.columnDef.header,
                               header.getContext()
                             )}
+
+                            {header.column.getCanSort() && (
+                              <button
+                                className="bg-gray-300 text-black hover:bg-gray-500 hover:text-white rounded-lg p-1 ml-2"
+                                onClick={header.column.getToggleSortingHandler()}
+                              >
+                                {/* 
+                                <svg
+                                  className="fill-current w-4 h-4 mr-2 stroke-2"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                                </svg>
+ */}
+                                {/*  
+                                <svg
+                                  dataSlot="icon"
+                                  fill="none"
+                                  strokeWidth={1.5}
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  aria-hidden="true"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
+                                  />
+                                </svg>
+ */}
+                                {/* 
+                                <svg
+                                  data-slot="icon"
+                                  fill="current"
+
+                                  strokeWidth="1.5"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  aria-hidden="true"
+                                >
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
+                                  ></path>
+                                </svg>
+                                 */}
+                              </button>
+                              /* 
+                              <Icon
+                                as={SortIcon}
+                                mx={3}
+                                fontSize={14}
+                                onClick={header.column.getToggleSortingHandler()}
+                              />
+ */
+                            )}
                           </th>
                         ))}
                       </tr>
@@ -243,7 +286,7 @@ const RecordList = () => {
                       ))
                     ) : (
                       <tr className="text-center h-32">
-                        <td colSpan={12}>No Recoard Found!</td>
+                        <td colSpan={12}>No Record Found!</td>
                       </tr>
                     )}
                   </tbody>
