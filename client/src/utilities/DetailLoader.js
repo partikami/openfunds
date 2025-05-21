@@ -13,12 +13,9 @@ export async function loader({ request, params }) {
   ); */
 
   if (!response.ok) {
-    throw new Response(
-      JSON.stringify({
-        message: "Could not fetch data.",
-      }),
-      { status: 500 }
-    );
+    throw new Response(JSON.stringify({ message: "Could not fetch data." }), {
+      status: 500,
+    });
   } else {
     return response;
   }

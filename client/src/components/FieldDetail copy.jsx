@@ -1,11 +1,17 @@
 // TODO - Add pagination functionality to detail page
 
-import { useEffect } from "react";
-import { Link, Form, useNavigate } from "react-router";
+import { useLoaderData, Link, Form, useNavigate } from "react-router";
 import { useAuthStore } from "../store/authStore";
-import { useRecordStore } from "../store/recordStore";
+// import { useRecordStore } from "../store/recordStore";
 
-export default function FieldDetail({ method, field }) {
+export default function FieldDetail({
+  method,
+  field,
+  fields,
+  currentPage,
+  currentPageSize,
+  currentSorting,
+}) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const navigate = useNavigate();
   /* 
@@ -14,26 +20,12 @@ export default function FieldDetail({ method, field }) {
     useLoaderData();
  */
 
-  /* 
   // Defensive: fallback to [] if fields is not an array
   const safeFields = Array.isArray(fields) ? fields : [];
   const currentIndex = safeFields.findIndex((f) => f && f._id === field._id);
   const getId = (idx) => safeFields[idx]?._id;
 
   console.log("fields", safeFields);
-  console.log("currentPage", currentPage);
-  console.log("currentPageSize", currentPageSize);
-  console.log("currentSorting", currentSorting);
-
- */
-
-  // Get everything from store
-  const fields = useRecordStore((state) => state.fields);
-  const currentPage = useRecordStore((state) => state.currentPage);
-  const currentPageSize = useRecordStore((state) => state.currentPageSize);
-  const currentSorting = useRecordStore((state) => state.currentSorting);
-
-  console.log("fields", fields);
   console.log("currentPage", currentPage);
   console.log("currentPageSize", currentPageSize);
   console.log("currentSorting", currentSorting);
@@ -182,8 +174,6 @@ export default function FieldDetail({ method, field }) {
       </div>
 
       {/* pagination */}
-
-      {/* 
       <div className="flex items-center justify-end mt-2 gap-2">
         <button
           onClick={goToFirst}
@@ -214,7 +204,6 @@ export default function FieldDetail({ method, field }) {
           {">>"}
         </button>
       </div>
- */}
     </article>
   );
 }

@@ -6,14 +6,19 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { ArrowsUpDownIcon } from "@heroicons/react/24/outline";
 
 import DebouncedInput from "./DebouncedInput";
 import { SearchIcon, SortIcon } from "../Icons/Icons";
 import { useLoaderData, Link } from "react-router";
 import { useAuthStore } from "../store/authStore";
+import { useRecordStore } from "../store/recordStore";
+
+const defaultPageSize = 10;
 
 const RecordList = () => {
   const columnHelper = createColumnHelper();
@@ -68,7 +73,7 @@ const RecordList = () => {
     columnHelper.accessor("introduced", {
       cell: (info) => <span>{info.getValue()}</span>,
       header: "In",
-      size: 400,
+      size: 150,
     }),
     columnHelper.accessor("depricated", {
       cell: (info) => <span>{info.getValue()}</span>,
@@ -90,7 +95,6 @@ const RecordList = () => {
   // This gathers the record's id and sends it to the react-router
   const ShowButton = ({ row }) => {
     const _id = `${row.original._id}`;
-
     return (
       <Link
         className="py-0 px-2 float-right mr-0 text-center text-cyan-900 font-normal text-base border-2 border-cyan-900 bg-white hover:bg-gray-300 hover:text-gray-800 rounded-lg transition duration-300"
@@ -101,23 +105,172 @@ const RecordList = () => {
     );
   };
 
-  // This retrieves all records from the database
+  // --- Retrieve all records from the database ---
   const data = useLoaderData();
 
   const [globalFilter, setGlobalFilter] = useState("");
 
+  const { setCurrentPage, setCurrentPageSize, setCurrentSorting } =
+    useRecordStore();
+
+  // --- Restore page index from session storage ---
+
+  /*   
+  const initialPageIndex =
+    Number(sessionStorage.getItem("currentPage") || 1) - 1;
+  const [pageIndex, setPageIndex] = useState(
+    isNaN(initialPageIndex) || initialPageIndex < 0 ? 0 : initialPageIndex
+  );
+ */
+
+  /*   
+  // --- Restore page size from session storage ---
+  const initialPageSize = Number(
+    sessionStorage.getItem("currentPageSize") || defaultPageSize
+  );
+  const [pageSize, setPageSize] = useState(
+    isNaN(initialPageSize) || initialPageSize <= 0
+      ? defaultPageSize
+      : initialPageSize
+  );
+  */
+
+  /*
+ // --- Restore sorting order from session storage ---
+ const initialSorting = JSON.parse(
+   sessionStorage.getItem("currentSorting") || "[]"
+ );
+ const [sorting, setSorting] = useState(initialSorting);
+ */
+
+  /* 
+  // --- Restore page index from recordStore ---
+  const initialPageIndex =
+    Number(useRecordStore((state) => state.currentPage) || 1) - 1;
+  const [pageIndex, setPageIndex] = useState(
+    isNaN(initialPageIndex) || initialPageIndex < 0 ? 0 : initialPageIndex
+  );
+
+  // --- Restore page size from recordStore ---
+  const initialPageSize = Number(
+    useRecordStore((state) => state.currentPageSize) || defaultPageSize
+  );
+  const [pageSize, setPageSize] = useState(
+    isNaN(initialPageSize) || initialPageSize <= 0
+      ? defaultPageSize
+      : initialPageSize
+  );
+
+  // --- Restore sorting order from recordStore ---
+  const initialSorting = useRecordStore((state) => state.currentSorting) || [];
+  const [sorting, setSorting] = useState(initialSorting);
+
   // This section displays the table with the individual records, the search field, pagination, etc.
+  // To make all columns sortable use "header.column.getCanSort() && ..." instead of
+  // "{["ofid", "fieldName", "introduced"].includes(header.id) && ...""
+ */
+
+  const initialPageIndex = useRecordStore((state) => state.currentPage);
+  const [pageIndex, setPageIndex] = useState(
+    isNaN(initialPageIndex) || initialPageIndex < 0 ? 0 : initialPageIndex
+  );
+
+  const initialPageSize = useRecordStore((state) => state.currentPageSize);
+  const [pageSize, setPageSize] = useState(
+    isNaN(initialPageSize) || initialPageSize <= 0
+      ? defaultPageSize
+      : initialPageSize
+  );
+
+  const initialSorting = useRecordStore((state) => state.currentSorting) || [];
+  const [sorting, setSorting] = useState(initialSorting);
+
   const table = useReactTable({
     data,
     columns,
     state: {
       globalFilter,
+      pagination: {
+        pageIndex,
+        pageSize,
+      },
+      sorting,
+    },
+    onSortingChange: setSorting,
+    onPaginationChange: (updater) => {
+      if (typeof updater === "function") {
+        const newState = updater({ pageIndex, pageSize });
+        setPageIndex(newState.pageIndex);
+        setPageSize(newState.pageSize);
+      } else {
+        setPageIndex(updater.pageIndex);
+        setPageSize(updater.pageSize);
+      }
     },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
+
+  // --- Update page number and page size in session storage whenever they change ---
+
+  useEffect(() => {
+    sessionStorage.setItem(
+      "currentPage",
+      table.getState().pagination.pageIndex
+    );
+    sessionStorage.setItem(
+      "currentPageSize",
+      table.getState().pagination.pageSize
+    );
+    sessionStorage.setItem(
+      "currentSorting",
+      JSON.stringify(table.getState().sorting)
+    );
+    setCurrentPage(table.getState().pagination.pageIndex);
+    setCurrentPageSize(table.getState().pagination.pageSize);
+    setCurrentSorting(
+      Array.isArray(table.getState().sorting) ? table.getState().sorting : []
+    );
+  }, [
+    table.getState().pagination.pageIndex,
+    table.getState().pagination.pageSize,
+    table.getState().sorting,
+  ]);
+
+  /*           
+  // Zustand setters
+  const setFields = useRecordStore((state) => state.setFields);
+  const setCurrentPage = useRecordStore((state) => state.setCurrentPage);
+  const setCurrentPageSize = useRecordStore(
+    (state) => state.setCurrentPageSize
+  );
+  const setCurrentSorting = useRecordStore((state) => state.setCurrentSorting);
+
+
+  // Store data and table state in the global store
+  useEffect(() => {
+    if (Array.isArray(data) && data.length > 0) {
+      setFields(data);
+    }
+    setCurrentPage(table.getState().pagination.pageIndex);
+    setCurrentPageSize(table.getState().pagination.pageSize);
+    setCurrentSorting(
+      Array.isArray(table.getState().sorting) ? table.getState().sorting : []
+    );
+  }, [
+    data,
+    setFields,
+    setCurrentPage,
+    setCurrentPageSize,
+    setCurrentSorting,
+    table,
+  ]);
+ */
+  // console.log("pageIndex", pageIndex);
+  // console.log("pageSize", pageSize);
+  // console.log("sorting", sorting);
 
   return (
     <>
@@ -145,6 +298,11 @@ const RecordList = () => {
                         {headerGroup.headers.map((header) => (
                           <th
                             key={header.id}
+                            style={
+                              header.column.columnDef.size
+                                ? { width: header.column.columnDef.size }
+                                : {}
+                            }
                             className={`py-2 px-2 ${
                               header.id === "introduced"
                                 ? "hidden sm:table-cell"
@@ -174,64 +332,17 @@ const RecordList = () => {
                               header.getContext()
                             )}
 
-                            {header.column.getCanSort() && (
+                            {["ofid", "fieldName", "introduced"].includes(
+                              header.id
+                            ) && (
                               <button
-                                className="bg-gray-300 text-black hover:bg-gray-500 hover:text-white rounded-lg p-1 ml-2"
                                 onClick={header.column.getToggleSortingHandler()}
                               >
-                                {/* 
-                                <svg
-                                  className="fill-current w-4 h-4 mr-2 stroke-2"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 20 20"
-                                >
-                                  <path d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
-                                </svg>
- */}
-                                {/*  
-                                <svg
-                                  dataSlot="icon"
-                                  fill="none"
-                                  strokeWidth={1.5}
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  aria-hidden="true"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
-                                  />
-                                </svg>
- */}
-                                {/* 
-                                <svg
-                                  data-slot="icon"
-                                  fill="current"
-
-                                  strokeWidth="1.5"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  aria-hidden="true"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
-                                  ></path>
-                                </svg>
-                                 */}
+                                <ArrowsUpDownIcon
+                                  className="h-6 w-6 text-white relative"
+                                  style={{ top: "6px" }}
+                                />
                               </button>
-                              /* 
-                              <Icon
-                                as={SortIcon}
-                                mx={3}
-                                fontSize={14}
-                                onClick={header.column.getToggleSortingHandler()}
-                              />
- */
                             )}
                           </th>
                         ))}
@@ -334,7 +445,8 @@ const RecordList = () => {
           >
             {">>"}
           </button>
-          {/* <span className="flex items-center gap-1">
+          {/* 
+          <span className="flex items-center gap-1">
             <div>
               <span className="flex items-center gap-1"></span>{" "}
             </div>
@@ -342,17 +454,18 @@ const RecordList = () => {
               {table.getState().pagination.pageIndex + 1} of{" "}
               {table.getPageCount()}
             </strong>
-          </span> */}
-          <span className="flex items-center gap-1 pl-2">
-            {/* | Go to: */}
+          </span>
+ */}
+          <span className="flex items-center gap-1 ">
+            {/*  | Go to: */}
             <input
               type="number"
-              defaultValue={table.getState().pagination.pageIndex + 1}
+              value={table.getState().pagination.pageIndex + 1}
               onChange={(e) => {
                 const page = e.target.value ? Number(e.target.value) - 1 : 0;
                 table.setPageIndex(page);
               }}
-              className="border p-1 text-right rounded w-12 bg-transparent"
+              className="border text-right rounded w-14 bg-transparent"
             />{" "}
             of {table.getPageCount()}
           </span>
