@@ -10,7 +10,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useCallback, useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { ArrowsUpDownIcon } from "@heroicons/react/24/outline";
 
 import DebouncedInput from "./DebouncedInput";
@@ -24,179 +24,79 @@ const defaultPageSize = 10;
 const RecordList = () => {
   const columnHelper = createColumnHelper();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const data = useLoaderData();
 
-  const currentRecord = useRecordStore((state) => state.currentRecord);
-
-  // Combine related state updates into a single object
-  const [tableState, setTableState] = useState({
-    pageIndex: useRecordStore.getState().currentPage || 0,
-    pageSize: useRecordStore.getState().currentPageSize || defaultPageSize,
-    sorting: useRecordStore.getState().currentSorting || [],
-    globalFilter: useRecordStore.getState().currentFilter || "",
-  });
-
-  // Memoize colums definition
-  const columns = useMemo(
-    () => [
-      columnHelper.display({
-        id: "actions",
-        header: isAuthenticated ? (
-          <Link
-            className="py-0 px-2 float-right mr-0 text-center text-cyan-900 font-bold text-lg border-2 border-gray-500 bg-gray-300 hover:bg-gray-500 hover:text-white rounded-lg transition duration-300"
-            to="create"
-          >
-            New
-          </Link>
-        ) : (
-          <span></span>
-        ),
-        cell: ({ row }) => <ShowButton row={row} />,
-        size: 100,
-      }),
-      columnHelper.accessor("ofid", {
-        cell: (info) => <span>{info.getValue()}</span>,
-        header: "OFID",
-        size: 120,
-      }),
-      columnHelper.accessor("fieldName", {
-        cell: (info) => <span>{info.getValue()}</span>,
-        header: "Field Name",
-        size: 400,
-      }),
-      columnHelper.accessor("dataType", {
-        cell: (info) => <span>{info.getValue()}</span>,
-        header: "Type",
-        enableSorting: false,
-        size: 150,
-      }),
-      columnHelper.accessor("level", {
-        cell: (info) => <span>{info.getValue()}</span>,
-        header: "Level",
-        size: 400,
-      }),
-      columnHelper.accessor("tags", {
-        cell: (info) => <span>{info.getValue()}</span>,
-        header: "Tags",
-        enableSorting: false,
-        size: 400,
-      }),
-      columnHelper.accessor("linkReference", {
-        cell: (info) => <span>{info.getValue()}</span>,
-        header: "Reference",
-        enableSorting: false,
-        size: 400,
-      }),
-      columnHelper.accessor("introduced", {
-        cell: (info) => <span>{info.getValue()}</span>,
-        header: "In",
-        size: 150,
-      }),
-      columnHelper.accessor("depricated", {
-        cell: (info) => <span>{info.getValue()}</span>,
-        header: "Out",
-        size: 400,
-      }),
-      columnHelper.accessor("values", {
-        cell: (info) => <span>{info.getValue()}</span>,
-        header: "Values",
-        enableSorting: false,
-        size: 120,
-      }),
-      columnHelper.accessor("example", {
-        cell: (info) => <span>{info.getValue()}</span>,
-        header: "Example",
-        enableSorting: false,
-        size: 120,
-      }),
-    ],
-    [isAuthenticated]
-  );
-
-  // Memoize table instance
-  const table = useReactTable({
-    data,
-    columns,
-    state: {
-      globalFilter: tableState.globalFilter,
-      pagination: {
-        pageIndex: tableState.pageIndex,
-        pageSize: tableState.pageSize,
-      },
-      sorting: tableState.sorting,
-    },
-    onSortingChange: (updater) => {
-      setTableState((prev) => ({
-        ...prev,
-        sorting:
-          typeof updater === "function" ? updater(prev.sorting) : updater,
-      }));
-    },
-    onPaginationChange: (updater) => {
-      setTableState((prev) => {
-        const newPagination =
-          typeof updater === "function"
-            ? updater({ pageIndex: prev.pageIndex, pageSize: prev.pageSize })
-            : updater;
-        return {
-          ...prev,
-          pageIndex: newPagination.pageIndex,
-          pageSize: newPagination.pageSize,
-        };
-      });
-    },
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-  });
-
-  // Memoize filtered data
-  const filteredAndSortedData = useMemo(
-    () => table.getPrePaginationRowModel().rows.map((row) => row.original),
-    [table.getPrePaginationRowModel().rows]
-  );
-
-  // Store page specifications in global store
-  useEffect(() => {
-    const {
-      setFields,
-      setCurrentPage,
-      setCurrentPageSize,
-      setCurrentSorting,
-      setCurrentFilter,
-    } = useRecordStore.getState();
-
-    if (Array.isArray(data) && data.length > 0) {
-      setFields(filteredAndSortedData);
-    }
-    setCurrentPage(tableState.pageIndex);
-    setCurrentPageSize(tableState.pageSize);
-    setCurrentSorting(tableState.sorting);
-    setCurrentFilter(tableState.globalFilter);
-  }, [tableState, filteredAndSortedData, data]);
-
-  const handleGlobalFilterChange = useCallback((value) => {
-    setTableState((prev) => ({
-      ...prev,
-      globalFilter: String(value),
-    }));
-  }, []);
-
-  // Recalculate page index when current record changes
-  useEffect(() => {
-    if (currentRecord) {
-      const calculatedPageIndex = Math.floor(
-        currentRecord / tableState.pageSize
-      );
-      if (calculatedPageIndex !== tableState.pageIndex) {
-        setTableState((prev) => ({
-          ...prev,
-          pageIndex: calculatedPageIndex,
-        }));
-      }
-    }
-  }, [currentRecord, tableState.pageSize]);
+  const columns = [
+    columnHelper.display({
+      id: "actions",
+      header: isAuthenticated ? (
+        <Link
+          className="py-0 px-2 float-right mr-0 text-center text-cyan-900 font-bold text-lg border-2 border-gray-500 bg-gray-300 hover:bg-gray-500 hover:text-white rounded-lg transition duration-300"
+          to="create"
+        >
+          New
+        </Link>
+      ) : (
+        <span></span>
+      ),
+      cell: ({ row }) => <ShowButton row={row} />,
+      size: 100,
+    }),
+    columnHelper.accessor("ofid", {
+      cell: (info) => <span>{info.getValue()}</span>,
+      header: "OFID",
+      size: 120,
+    }),
+    columnHelper.accessor("fieldName", {
+      cell: (info) => <span>{info.getValue()}</span>,
+      header: "Field Name",
+      size: 400,
+    }),
+    columnHelper.accessor("dataType", {
+      cell: (info) => <span>{info.getValue()}</span>,
+      header: "Type",
+      enableSorting: false,
+      size: 150,
+    }),
+    columnHelper.accessor("level", {
+      cell: (info) => <span>{info.getValue()}</span>,
+      header: "Level",
+      size: 400,
+    }),
+    columnHelper.accessor("tags", {
+      cell: (info) => <span>{info.getValue()}</span>,
+      header: "Tags",
+      enableSorting: false,
+      size: 400,
+    }),
+    columnHelper.accessor("linkReference", {
+      cell: (info) => <span>{info.getValue()}</span>,
+      header: "Reference",
+      enableSorting: false,
+      size: 400,
+    }),
+    columnHelper.accessor("introduced", {
+      cell: (info) => <span>{info.getValue()}</span>,
+      header: "In",
+      size: 150,
+    }),
+    columnHelper.accessor("depricated", {
+      cell: (info) => <span>{info.getValue()}</span>,
+      header: "Out",
+      size: 400,
+    }),
+    columnHelper.accessor("values", {
+      cell: (info) => <span>{info.getValue()}</span>,
+      header: "Values",
+      enableSorting: false,
+      size: 120,
+    }),
+    columnHelper.accessor("example", {
+      cell: (info) => <span>{info.getValue()}</span>,
+      header: "Example",
+      enableSorting: false,
+      size: 120,
+    }),
+  ];
 
   // This gathers the record's id and sends it to the react-router
   const ShowButton = ({ row }) => {
@@ -211,6 +111,112 @@ const RecordList = () => {
     );
   };
 
+  // Retrieve all records from the database
+  const data = useLoaderData();
+
+  // Initialize global filter state
+  const initialFilter = useRecordStore((state) => state.currentFilter);
+  const [globalFilter, setGlobalFilter] = useState(initialFilter);
+
+  // Retrieve initial fields array, page index, page size, sorting and record index from Zustand store
+  const fields = useRecordStore((state) => state.fields) || [];
+
+  const initialPage = useRecordStore((state) => state.currentPage);
+  const [pageIndex, setPageIndex] = useState(
+    isNaN(initialPage) || initialPage < 0 ? 0 : initialPage
+  );
+
+  const initialPageSize = useRecordStore((state) => state.currentPageSize);
+  const [pageSize, setPageSize] = useState(
+    isNaN(initialPageSize) || initialPageSize <= 0
+      ? defaultPageSize
+      : initialPageSize
+  );
+
+  const initialSorting = useRecordStore((state) => state.currentSorting) || [];
+  const [sorting, setSorting] = useState(initialSorting);
+
+  const initialRecord = useRecordStore((state) => state.currentRecord);
+  const [record, setRecord] = useState(
+    isNaN(initialRecord) || initialRecord < 0 ? 0 : initialRecord
+  );
+
+  const recalculatedPageIndex = Math.floor(record / pageSize) || 0; // Calculate the page index based on the record index and page size
+  useEffect(() => {
+    if (recalculatedPageIndex !== pageIndex) {
+      setPageIndex(recalculatedPageIndex);
+    }
+  }, []);
+
+  //
+
+  const table = useReactTable({
+    data,
+    columns,
+    state: {
+      globalFilter,
+      pagination: {
+        pageIndex,
+        pageSize,
+      },
+      sorting,
+    },
+    onSortingChange: setSorting,
+    onPaginationChange: (updater) => {
+      if (typeof updater === "function") {
+        const newState = updater({ pageIndex, pageSize });
+        setPageIndex(newState.pageIndex);
+        setPageSize(newState.pageSize);
+      } else {
+        setPageIndex(updater.pageIndex);
+        setPageSize(updater.pageSize);
+      }
+    },
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  });
+
+  const filteredAndSortedData = table.getPrePaginationRowModel().rows;
+  const currentListItems = filteredAndSortedData.map((row) => row.original);
+
+  // Update page index, page size, sorting and global filter in global store whenever they change
+  // Zustand setters
+  const setFields = useRecordStore((state) => state.setFields);
+  const setCurrentPage = useRecordStore((state) => state.setCurrentPage);
+  const setCurrentPageSize = useRecordStore(
+    (state) => state.setCurrentPageSize
+  );
+  const setCurrentSorting = useRecordStore((state) => state.setCurrentSorting);
+  const setCurrentFilter = useRecordStore((state) => state.setCurrentFilter);
+
+  // Store data and table state in the global store
+  useEffect(() => {
+    if (Array.isArray(data) && data.length > 0) {
+      setFields(currentListItems);
+    }
+    setCurrentPage(table.getState().pagination.pageIndex);
+    setCurrentPageSize(table.getState().pagination.pageSize);
+    setCurrentSorting(
+      Array.isArray(table.getState().sorting) ? table.getState().sorting : []
+    );
+    setCurrentFilter(globalFilter);
+  }, [
+    table.getState().pagination.pageIndex,
+    table.getState().pagination.pageSize,
+    table.getState().sorting,
+    table.getState().globalFilter,
+  ]);
+
+  // console.log("currentListItems", currentListItems);
+  // console.log("fields", fields);
+  console.log("pageIndex", pageIndex);
+  // console.log("pageSize", pageSize);
+  // console.log("sorting", sorting);
+  // console.log("globalFilter", globalFilter);
+  // console.log("record", record);
+
   return (
     <>
       <div className="p-2 mx-auto text-black fill-gray-600">
@@ -218,8 +224,8 @@ const RecordList = () => {
           <div className="pt-12 w-full flex items-center gap-1">
             <SearchIcon />
             <DebouncedInput
-              value={tableState.globalFilter ?? ""}
-              onChange={handleGlobalFilterChange}
+              value={globalFilter ?? ""}
+              onChange={(value) => setGlobalFilter(String(value))}
               className="bg-transparent outline-none border-b-2 w-1/5 focus:w-1/3 duration-300 border-gray-600"
               placeholder="Search ..."
             />

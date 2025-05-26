@@ -157,7 +157,7 @@ const RecordList = () => {
     [table.getPrePaginationRowModel().rows]
   );
 
-  // Store page specifications in global store
+  // Combine all store updates into a single effect
   useEffect(() => {
     const {
       setFields,
@@ -183,7 +183,7 @@ const RecordList = () => {
     }));
   }, []);
 
-  // Recalculate page index when current record changes
+  // Add this after the existing store update effect
   useEffect(() => {
     if (currentRecord) {
       const calculatedPageIndex = Math.floor(
@@ -210,6 +210,50 @@ const RecordList = () => {
       </Link>
     );
   };
+
+  // Initialize global filter state
+  // const initialFilter = useRecordStore((state) => state.currentFilter);
+
+  // Retrieve initial fields array, page index, page size, sorting and record index from Zustand store
+  /* 
+  const fields = useRecordStore((state) => state.fields) || [];
+  const initialPage = useRecordStore((state) => state.currentPage);
+  const initialPageSize = useRecordStore((state) => state.currentPageSize);
+  const initialSorting = useRecordStore((state) => state.currentSorting) || [];
+  const initialRecord = useRecordStore((state) => state.currentRecord);
+ */
+
+  /* 
+  const recalculatedPageIndex = Math.floor(record / pageSize) || 0; // Calculate the page index based on the record index and page size
+  useEffect(() => {
+    if (recalculatedPageIndex !== pageIndex) {
+      setPageIndex(recalculatedPageIndex);
+    }
+  }, []);
+ */
+
+  /*  
+  // const filteredAndSortedData = table.getPrePaginationRowModel().rows;
+  const currentListItems = filteredAndSortedData.map((row) => row.original);
+
+  // Update page index, page size, sorting and global filter in global store whenever they change
+  // Zustand setters
+  const setFields = useRecordStore((state) => state.setFields);
+  const setCurrentPage = useRecordStore((state) => state.setCurrentPage);
+  const setCurrentPageSize = useRecordStore(
+    (state) => state.setCurrentPageSize
+  );
+  const setCurrentSorting = useRecordStore((state) => state.setCurrentSorting);
+  const setCurrentFilter = useRecordStore((state) => state.setCurrentFilter);
+ */
+
+  // console.log("currentListItems", currentListItems);
+  // console.log("fields", fields);
+  // console.log("pageIndex", pageIndex);
+  // console.log("pageSize", pageSize);
+  // console.log("sorting", sorting);
+  // console.log("globalFilter", globalFilter);
+  // console.log("record", record);
 
   return (
     <>

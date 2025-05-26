@@ -11,9 +11,6 @@ export default function FieldDetail({ method, field }) {
 
   // Get everything from store
   const fields = useRecordStore((state) => state.fields);
-  // const currentPage = useRecordStore((state) => state.currentPage);
-  // const currentPageSize = useRecordStore((state) => state.currentPageSize);
-  const currentSorting = useRecordStore((state) => state.currentSorting);
 
   // Get current record
   const currentRecord = fields.findIndex((f) => f && f._id === field._id);
@@ -21,11 +18,6 @@ export default function FieldDetail({ method, field }) {
 
   // Zustand setters
   const setCurrentRecord = useRecordStore((state) => state.setCurrentRecord);
-
-  console.log("fields", fields);
-  // console.log("currentPage", currentPage);
-  // console.log("currentPageSize", currentPageSize);
-  // console.log("currentSorting", currentSorting);
 
   // Navigation handlers
   const goToFirst = () => navigate(`../${getId(0)}`);
