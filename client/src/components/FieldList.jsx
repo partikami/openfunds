@@ -1,4 +1,5 @@
-// TODO - Add sorting to columns: OFID, Fieldname, In, Out
+// TODO - Add more filtering options
+// TODO - Add export functionality
 
 import {
   createColumnHelper,
@@ -53,6 +54,7 @@ const RecordList = () => {
     columnHelper.accessor("dataType", {
       cell: (info) => <span>{info.getValue()}</span>,
       header: "Type",
+      enableSorting: false,
       size: 150,
     }),
     columnHelper.accessor("level", {
@@ -63,11 +65,13 @@ const RecordList = () => {
     columnHelper.accessor("tags", {
       cell: (info) => <span>{info.getValue()}</span>,
       header: "Tags",
+      enableSorting: false,
       size: 400,
     }),
     columnHelper.accessor("linkReference", {
       cell: (info) => <span>{info.getValue()}</span>,
       header: "Reference",
+      enableSorting: false,
       size: 400,
     }),
     columnHelper.accessor("introduced", {
@@ -83,11 +87,13 @@ const RecordList = () => {
     columnHelper.accessor("values", {
       cell: (info) => <span>{info.getValue()}</span>,
       header: "Values",
+      enableSorting: false,
       size: 120,
     }),
     columnHelper.accessor("example", {
       cell: (info) => <span>{info.getValue()}</span>,
       header: "Example",
+      enableSorting: false,
       size: 120,
     }),
   ];
@@ -203,17 +209,13 @@ const RecordList = () => {
     table.getState().globalFilter,
   ]);
 
-  // table;
-
-  // console.log("data", data);
-  console.log("currentListItems", currentListItems);
-  // console.log("table", table);
+  // console.log("currentListItems", currentListItems);
   // console.log("fields", fields);
   console.log("pageIndex", pageIndex);
   // console.log("pageSize", pageSize);
   // console.log("sorting", sorting);
   // console.log("globalFilter", globalFilter);
-  console.log("record", record);
+  // console.log("record", record);
 
   return (
     <>
@@ -274,10 +276,7 @@ const RecordList = () => {
                               header.column.columnDef.header,
                               header.getContext()
                             )}
-
-                            {["ofid", "fieldName", "introduced"].includes(
-                              header.id
-                            ) && (
+                            {header.column.getCanSort() && (
                               <button
                                 onClick={header.column.getToggleSortingHandler()}
                               >
@@ -287,6 +286,12 @@ const RecordList = () => {
                                 />
                               </button>
                             )}
+                            {
+                              {
+                                asc: "🔼",
+                                desc: "🔽",
+                              }[header.column.getIsSorted()]
+                            }
                           </th>
                         ))}
                       </tr>
