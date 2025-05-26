@@ -8,41 +8,35 @@ import { useRecordStore } from "../store/recordStore";
 export default function FieldDetail({ method, field }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const navigate = useNavigate();
-  /* 
-  // Get everything from loader
-  const { field, fields, currentPage, currentPageSize, currentSorting } =
-    useLoaderData();
- */
-
-  /* 
-  // Defensive: fallback to [] if fields is not an array
-  const safeFields = Array.isArray(fields) ? fields : [];
-  const currentIndex = safeFields.findIndex((f) => f && f._id === field._id);
-  const getId = (idx) => safeFields[idx]?._id;
-
-  console.log("fields", safeFields);
-  console.log("currentPage", currentPage);
-  console.log("currentPageSize", currentPageSize);
-  console.log("currentSorting", currentSorting);
-
- */
 
   // Get everything from store
   const fields = useRecordStore((state) => state.fields);
-  const currentPage = useRecordStore((state) => state.currentPage);
-  const currentPageSize = useRecordStore((state) => state.currentPageSize);
+  // const currentPage = useRecordStore((state) => state.currentPage);
+  // const currentPageSize = useRecordStore((state) => state.currentPageSize);
   const currentSorting = useRecordStore((state) => state.currentSorting);
 
+  // Get current record
+  const currentRecord = fields.findIndex((f) => f && f._id === field._id);
+  const getId = (idx) => fields[idx]?._id;
+
+  // Zustand setters
+  const setCurrentRecord = useRecordStore((state) => state.setCurrentRecord);
+
   console.log("fields", fields);
-  console.log("currentPage", currentPage);
-  console.log("currentPageSize", currentPageSize);
-  console.log("currentSorting", currentSorting);
+  // console.log("currentPage", currentPage);
+  // console.log("currentPageSize", currentPageSize);
+  // console.log("currentSorting", currentSorting);
 
   // Navigation handlers
   const goToFirst = () => navigate(`../${getId(0)}`);
-  const goToPrev = () => navigate(`../${getId(currentIndex - 1)}`);
-  const goToNext = () => navigate(`../${getId(currentIndex + 1)}`);
+  const goToPrev = () => navigate(`../${getId(currentRecord - 1)}`);
+  const goToNext = () => navigate(`../${getId(currentRecord + 1)}`);
   const goToLast = () => navigate(`../${getId(fields.length - 1)}`);
+
+  // Store current record in Zustand store
+  useEffect(() => {
+    setCurrentRecord(currentRecord);
+  }, [currentRecord]);
 
   return (
     <article>
@@ -183,38 +177,36 @@ export default function FieldDetail({ method, field }) {
 
       {/* pagination */}
 
-      {/* 
       <div className="flex items-center justify-end mt-2 gap-2">
         <button
           onClick={goToFirst}
-          disabled={currentIndex <= 0}
+          disabled={currentRecord <= 0}
           className="p-1 border border-gray-300 px-2 disabled:opacity-30"
         >
           {"<<"}
         </button>
         <button
           onClick={goToPrev}
-          disabled={currentIndex <= 0}
+          disabled={currentRecord <= 0}
           className="p-1 border border-gray-300 px-2 disabled:opacity-30"
         >
           {"<"}
         </button>
         <button
           onClick={goToNext}
-          disabled={currentIndex >= fields.length - 1}
+          disabled={currentRecord >= fields.length - 1}
           className="p-1 border border-gray-300 px-2 disabled:opacity-30"
         >
           {">"}
         </button>
         <button
           onClick={goToLast}
-          disabled={currentIndex >= fields.length - 1}
+          disabled={currentRecord >= fields.length - 1}
           className="p-1 border border-gray-300 px-2 disabled:opacity-30"
         >
           {">>"}
         </button>
       </div>
- */}
     </article>
   );
 }

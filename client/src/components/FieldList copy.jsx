@@ -109,8 +109,65 @@ const RecordList = () => {
   const data = useLoaderData();
 
   // Initialize global filter state
-  const initialFilter = useRecordStore((state) => state.currentFilter);
-  const [globalFilter, setGlobalFilter] = useState(initialFilter);
+  const [globalFilter, setGlobalFilter] = useState("");
+
+  // const { setCurrent Page, setCurrentPageSize, setCurrentSorting } = useRecordStore();
+
+  // --- Restore page index from session storage ---
+  /*   
+  const initialPageIndex =
+    Number(sessionStorage.getItem("currentPage") || 1) - 1;
+  const [pageIndex, setPageIndex] = useState(
+    isNaN(initialPageIndex) || initialPageIndex < 0 ? 0 : initialPageIndex
+  );
+ */
+
+  /*   
+  // --- Restore page size from session storage ---
+  const initialPageSize = Number(
+    sessionStorage.getItem("currentPageSize") || defaultPageSize
+  );
+  const [pageSize, setPageSize] = useState(
+    isNaN(initialPageSize) || initialPageSize <= 0
+      ? defaultPageSize
+      : initialPageSize
+  );
+  */
+
+  /*
+ // --- Restore sorting order from session storage ---
+ const initialSorting = JSON.parse(
+   sessionStorage.getItem("currentSorting") || "[]"
+ );
+ const [sorting, setSorting] = useState(initialSorting);
+ */
+
+  /* 
+  // --- Restore page index from recordStore ---
+  const initialPageIndex =
+    Number(useRecordStore((state) => state.currentPage) || 1) - 1;
+  const [pageIndex, setPageIndex] = useState(
+    isNaN(initialPageIndex) || initialPageIndex < 0 ? 0 : initialPageIndex
+  );
+
+  // --- Restore page size from recordStore ---
+  const initialPageSize = Number(
+    useRecordStore((state) => state.currentPageSize) || defaultPageSize
+  );
+  const [pageSize, setPageSize] = useState(
+    isNaN(initialPageSize) || initialPageSize <= 0
+      ? defaultPageSize
+      : initialPageSize
+  );
+
+  // --- Restore sorting order from recordStore ---
+  const initialSorting = useRecordStore((state) => state.currentSorting) || [];
+  const [sorting, setSorting] = useState(initialSorting);
+
+  // This section displays the table with the individual records, the search field, pagination, etc.
+  // To make all columns sortable use "header.column.getCanSort() && ..." instead of
+  // "{["ofid", "fieldName", "introduced"].includes(header.id) && ...""
+ */
 
   // Retrieve initial fields array, page index, page size, sorting and record index from Zustand store
   const fields = useRecordStore((state) => state.fields) || [];
@@ -134,15 +191,6 @@ const RecordList = () => {
   const [record, setRecord] = useState(
     isNaN(initialRecord) || initialRecord < 0 ? 0 : initialRecord
   );
-
-  const recalculatedPageIndex = Math.floor(record / pageSize) || 0; // Calculate the page index based on the record index and page size
-  useEffect(() => {
-    if (recalculatedPageIndex !== pageIndex) {
-      setPageIndex(recalculatedPageIndex);
-    }
-  }, []);
-
-  //
 
   const table = useReactTable({
     data,
@@ -172,10 +220,32 @@ const RecordList = () => {
     getSortedRowModel: getSortedRowModel(),
   });
 
-  const filteredAndSortedData = table.getPrePaginationRowModel().rows;
-  const currentListItems = filteredAndSortedData.map((row) => row.original);
+  // --- Update page number and page size in session storage whenever they change ---
 
-  // Update page index, page size, sorting and global filter in global store whenever they change
+  useEffect(() => {
+    sessionStorage.setItem(
+      "currentPage",
+      table.getState().pagination.pageIndex
+    );
+    sessionStorage.setItem(
+      "currentPageSize",
+      table.getState().pagination.pageSize
+    );
+    sessionStorage.setItem(
+      "currentSorting",
+      JSON.stringify(table.getState().sorting)
+    );
+    setCurrentPage(table.getState().pagination.pageIndex);
+    setCurrentPageSize(table.getState().pagination.pageSize);
+    setCurrentSorting(
+      Array.isArray(table.getState().sorting) ? table.getState().sorting : []
+    );
+  }, [
+    table.getState().pagination.pageIndex,
+    table.getState().pagination.pageSize,
+    table.getState().sorting,
+  ]);
+
   // Zustand setters
   const setFields = useRecordStore((state) => state.setFields);
   const setCurrentPage = useRecordStore((state) => state.setCurrentPage);
@@ -183,37 +253,30 @@ const RecordList = () => {
     (state) => state.setCurrentPageSize
   );
   const setCurrentSorting = useRecordStore((state) => state.setCurrentSorting);
-  const setCurrentFilter = useRecordStore((state) => state.setCurrentFilter);
 
   // Store data and table state in the global store
   useEffect(() => {
     if (Array.isArray(data) && data.length > 0) {
-      setFields(currentListItems);
+      setFields(data);
     }
     setCurrentPage(table.getState().pagination.pageIndex);
     setCurrentPageSize(table.getState().pagination.pageSize);
     setCurrentSorting(
       Array.isArray(table.getState().sorting) ? table.getState().sorting : []
     );
-    setCurrentFilter(globalFilter);
   }, [
-    table.getState().pagination.pageIndex,
-    table.getState().pagination.pageSize,
-    table.getState().sorting,
-    table.getState().globalFilter,
+    data,
+    setFields,
+    setCurrentPage,
+    setCurrentPageSize,
+    setCurrentSorting,
+    table,
   ]);
 
-  // table;
-
   // console.log("data", data);
-  console.log("currentListItems", currentListItems);
-  // console.log("table", table);
-  // console.log("fields", fields);
   console.log("pageIndex", pageIndex);
-  // console.log("pageSize", pageSize);
-  // console.log("sorting", sorting);
-  // console.log("globalFilter", globalFilter);
-  console.log("record", record);
+  console.log("pageSize", pageSize);
+  console.log("sorting", sorting);
 
   return (
     <>
@@ -388,7 +451,17 @@ const RecordList = () => {
           >
             {">>"}
           </button>
-
+          {/* 
+          <span className="flex items-center gap-1">
+            <div>
+              <span className="flex items-center gap-1"></span>{" "}
+            </div>
+            <strong>
+              {table.getState().pagination.pageIndex + 1} of{" "}
+              {table.getPageCount()}
+            </strong>
+          </span>
+ */}
           <span className="flex items-center gap-1 ">
             {/*  | Go to: */}
             <input

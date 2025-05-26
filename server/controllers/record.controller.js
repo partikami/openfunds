@@ -36,6 +36,17 @@ export const createOne = async (req, res) => {
   }
 
   // Check if the OFID already exists in the database
+  let ofidAlreadyExists = false;
+  try {
+    const existing = await Field.findOne({ ofid });
+    if (existing) {
+      ofidAlreadyExists = true;
+    }
+  } catch (err) {
+    console.error("Error checking OFID existence:", err);
+    return res.status(500).send("Error checking OFID existence");
+  }
+
   if (ofidAlreadyExists) {
     return res
       .status(400)
