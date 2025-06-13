@@ -25,7 +25,7 @@ export const createOne = async (req, res) => {
     example,
     linkReference,
     introduced,
-    depricated,
+    deprecated,
   } = req.body;
 
   // Validate the input data
@@ -65,7 +65,7 @@ export const createOne = async (req, res) => {
       example,
       linkReference,
       introduced,
-      depricated,
+      deprecated,
     });
     await ofField.save();
     res.status(204).send(ofField);

@@ -92,7 +92,7 @@ const RecordList = () => {
         header: "In",
         size: 150,
       }),
-      columnHelper.accessor("depricated", {
+      columnHelper.accessor("deprecated", {
         cell: (info) => <span>{info.getValue()}</span>,
         header: "Out",
         size: 400,
@@ -260,7 +260,7 @@ const RecordList = () => {
                                 ? "hidden xl:table-cell"
                                 : ""
                             } ${
-                              header.id.slice(-10) === "depricated" ||
+                              header.id.slice(-10) === "deprecated" ||
                               header.id === "values"
                                 ? "hidden 2xl:table-cell"
                                 : ""
@@ -321,7 +321,7 @@ const RecordList = () => {
                                   ? "hidden xl:table-cell"
                                   : ""
                               } ${
-                                cell.id.slice(-10) === "depricated" ||
+                                cell.id.slice(-10) === "deprecated" ||
                                 cell.id.slice(-6) === "values"
                                   ? "hidden 2xl:table-cell"
                                   : ""

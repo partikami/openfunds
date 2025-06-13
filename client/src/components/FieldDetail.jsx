@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { Link, Form, useNavigate } from "react-router";
+
 import { useAuthStore } from "../store/authStore";
 import { useRecordStore } from "../store/recordStore";
 
@@ -29,6 +30,14 @@ export default function FieldDetail({ method, field }) {
   useEffect(() => {
     setCurrentRecord(currentRecord);
   }, [currentRecord]);
+
+  const bgColor = field?.tags?.includes("Under Review")
+    ? "bg-yellow-100"
+    : "bg-gray-200";
+
+  const remark = field?.tags?.includes("Under Review")
+    ? " (This field is under review and may differ from the official version on www.openfunds.org)"
+    : "";
 
   return (
     <article>
@@ -66,16 +75,16 @@ export default function FieldDetail({ method, field }) {
           <div className="block tracking-wide text-black text-2xl font-bold mb-2">
             {field.ofid}
           </div>
-          {/* <div className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight">
-            {field.ofid}
+          {/* <div className="appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight">
+            {field.ofid}bg
           </div> */}
         </div>
 
         <div className="w-full md:w-9/12 px-3">
           <div className="block tracking-wide text-black text-2xl font-bold mb-2">
-            {field.fieldName}
+            {field.fieldName} <span className="text-red-500">{remark}</span>
           </div>
-          {/* <div className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight">
+          {/* <div className="appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight">
             {field.fieldName}
           </div> */}
         </div>
@@ -85,7 +94,9 @@ export default function FieldDetail({ method, field }) {
           <div className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2">
             Data Type
           </div>
-          <div className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight">
+          <div
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
+          >
             {field.dataType}
           </div>
         </div>
@@ -94,7 +105,9 @@ export default function FieldDetail({ method, field }) {
           <div className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2">
             Level
           </div>
-          <div className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight">
+          <div
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
+          >
             {field.level}
           </div>
         </div>
@@ -103,9 +116,16 @@ export default function FieldDetail({ method, field }) {
           <div className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2">
             Tags
           </div>
-          <div className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight">
-            {field.tags}
-          </div>
+          <select
+            multiple
+            className={`appearance-none block w-full ${bgColor} text-gray-700 border border-gray-700 rounded py-1 px-4 mb-3 leading-tight max-h-12 overflow-auto`}
+          >
+            {field.tags.map((tag) => (
+              <option key={tag} value={tag}>
+                {tag}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
       <div className="flex flex-wrap -mx-3">
@@ -113,7 +133,9 @@ export default function FieldDetail({ method, field }) {
           <div className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2">
             Link Reference
           </div>
-          <div className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight">
+          <div
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
+          >
             {field.linkReference}
           </div>
         </div>
@@ -122,7 +144,9 @@ export default function FieldDetail({ method, field }) {
           <div className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2">
             Introduced in Version
           </div>
-          <div className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight">
+          <div
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
+          >
             {field.introduced}
           </div>
         </div>
@@ -131,8 +155,10 @@ export default function FieldDetail({ method, field }) {
           <div className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2">
             Valid until Version
           </div>
-          <div className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight">
-            {field.depricated}
+          <div
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
+          >
+            {field.deprecated}
           </div>
         </div>
       </div>
@@ -141,7 +167,9 @@ export default function FieldDetail({ method, field }) {
           <div className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2">
             Values
           </div>
-          <div className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight">
+          <div
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
+          >
             {field.values}
           </div>
         </div>
@@ -151,7 +179,9 @@ export default function FieldDetail({ method, field }) {
           <div className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2">
             Example
           </div>
-          <div className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight">
+          <div
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
+          >
             {field.example}
           </div>
         </div>
@@ -161,14 +191,33 @@ export default function FieldDetail({ method, field }) {
           <div className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2">
             Description
           </div>
-          <div className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight">
+          <div
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
+          >
             {field.description}
           </div>
         </div>
       </div>
+      {field.uploadedFile && (
+        <div className="flex flex-wrap -mx-3">
+          <div className="w-full px-3">
+            <div className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2">
+              Image
+            </div>
+            <div
+              className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
+            >
+              <img
+                src={`http://localhost:5050/uploads/${field.uploadedFile}`}
+                alt={field.uploadedFile}
+                className="max-w-full h-auto"
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* pagination */}
-
       <div className="flex items-center justify-end mt-2 gap-2">
         <button
           onClick={goToFirst}

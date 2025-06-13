@@ -1,10 +1,46 @@
 import { Form, useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+
+import FileUploader from "./FileUploader.jsx";
+import { useFileStore } from "../store/fileStore.js";
 
 export default function FieldEdit({ method, field }) {
   const navigate = useNavigate();
+  const [ofid, setOfid] = useState(field ? field.ofid : "");
+
+  // THIS IS NEW: Create a state for tags, defaulting to the field's tags if any.
+  const [selectedTags, setSelectedTags] = useState(field?.tags || []);
+
+  // Access both the uploaded file and its setter from Zustand
+  const uploadedFile = useFileStore((state) => state.uploadedFile);
+  const setUploadedFile = useFileStore((state) => state.setUploadedFile);
+
+  // Only clear the uploaded file if the field doesn't have one.
+  useEffect(() => {
+    if (field.uploadedFile) {
+      setUploadedFile(null);
+    }
+  }, [setUploadedFile, field]);
 
   function handleCancel() {
     navigate("..");
+  }
+
+  // Compute bgColor based on selectedTags so it updates immediately.
+  const bgColor = selectedTags.includes("Under Review")
+    ? "bg-yellow-100"
+    : "bg-gray-200";
+
+  // THIS IS NEW: Update state when tags are changed.
+  function handleTagsChange(e) {
+    const options = e.target.options;
+    const selected = [];
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].selected) {
+        selected.push(options[i].value);
+      }
+    }
+    setSelectedTags(selected);
   }
 
   return (
@@ -24,7 +60,6 @@ export default function FieldEdit({ method, field }) {
           Cancel
         </button>
       </div>
-
       <div className="flex flex-wrap -mx-3">
         <div className="w-full md:w-1/3 px-3">
           <label
@@ -34,12 +69,13 @@ export default function FieldEdit({ method, field }) {
             OFID
           </label>
           <input
-            className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight"
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
             id="ofid"
             name="ofid"
             type="text"
             required
-            defaultValue={field ? field.ofid : ""}
+            value={ofid}
+            onChange={(e) => setOfid(e.target.value)}
           />
         </div>
 
@@ -51,7 +87,7 @@ export default function FieldEdit({ method, field }) {
             Field Name
           </label>
           <input
-            className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight"
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
             id="fieldName"
             name="fieldName"
             type="text"
@@ -60,7 +96,6 @@ export default function FieldEdit({ method, field }) {
           />
         </div>
       </div>
-
       <div className="flex flex-wrap -mx-3">
         <div className="w-full md:w-1/3 px-3">
           <label
@@ -70,7 +105,7 @@ export default function FieldEdit({ method, field }) {
             Data Type
           </label>
           <input
-            className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight"
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
             id="dataType"
             name="dataType"
             type="text"
@@ -86,7 +121,7 @@ export default function FieldEdit({ method, field }) {
             Level
           </label>
           <input
-            className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight"
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
             id="level"
             name="level"
             type="text"
@@ -99,15 +134,51 @@ export default function FieldEdit({ method, field }) {
             className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2"
             htmlFor="tags"
           >
-            Tags
+            Tags (Select multiple)
           </label>
-          <input
-            className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight"
+          <select
             id="tags"
             name="tags"
-            type="text"
-            defaultValue={field ? field.tags : ""}
-          />
+            multiple
+            value={selectedTags}
+            onChange={handleTagsChange}
+            className={`appearance-none block w-full ${bgColor} text-gray-700 border border-gray-700 rounded py-1 px-4 mb-3 leading-tight max-h-16 overflow-y-auto`}
+          >
+            {field &&
+              field.tags &&
+              field.tags.map((tag) => (
+                <option key={tag} value={tag}>
+                  {tag}
+                </option>
+              ))}
+            {/* Optionally, add additional predefined tags */}
+            <option value="Country-AT">Country-AT</option>
+            <option value="Country-BE">Country-BE</option>
+            <option value="Country-CH">Country-CH</option>
+            <option value="Country-DE">Country-DE</option>
+            <option value="Country-DK">Country-DK</option>
+            <option value="Country-FR">Country-FR</option>
+            <option value="Country-GB">Country-GB</option>
+            <option value="Country-IE">Country-IE</option>
+            <option value="Country-IT">Country-IT</option>
+            <option value="Country-LI">Country-LI</option>
+            <option value="Country-LU">Country-LU</option>
+            <option value="Country-NL">Country-NL</option>
+            <option value="Deprecated">Deprecated</option>
+            <option value="Draft">Draft</option>
+            <option value="Dynamic Data">Dynamic Data</option>
+            <option value="Experimental">Experimental</option>
+            <option value="FinDatex-CEPT">FinDatex-CEPT</option>
+            <option value="FinDatex-EET">FinDatex-EET</option>
+            <option value="FinDatex-EMT">FinDatex-EMT</option>
+            <option value="FinDatex-EPT">FinDatex-EPT</option>
+            <option value="FinDatex-TPT">FinDatex-TPT</option>
+            <option value="Internal">Internal</option>
+            <option value="Public">Public</option>
+            <option value="Private">Private</option>
+            <option value="Stable">Stable</option>
+            <option value="Under Review">Under Review</option>
+          </select>
         </div>
       </div>
 
@@ -120,7 +191,7 @@ export default function FieldEdit({ method, field }) {
             Link Reference
           </label>
           <input
-            className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight"
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
             id="linkReference"
             name="linkReference"
             type="text"
@@ -136,7 +207,7 @@ export default function FieldEdit({ method, field }) {
             Introduced in Version
           </label>
           <input
-            className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight"
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
             id="introduced"
             name="introduced"
             type="text"
@@ -147,20 +218,19 @@ export default function FieldEdit({ method, field }) {
         <div className="w-full md:w-1/3 px-3">
           <label
             className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2"
-            htmlFor="depricated"
+            htmlFor="deprecated"
           >
             Valid until Version
           </label>
           <input
-            className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight"
-            id="depricated"
-            name="depricated"
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
+            id="deprecated"
+            name="deprecated"
             type="text"
-            defaultValue={field ? field.depricated : ""}
+            defaultValue={field ? field.deprecated : ""}
           />
         </div>
       </div>
-
       <div className="flex flex-wrap -mx-3">
         <div className="w-full px-3">
           <label
@@ -170,7 +240,7 @@ export default function FieldEdit({ method, field }) {
             Values
           </label>
           <input
-            className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight"
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
             id="values"
             name="values"
             type="text"
@@ -178,7 +248,6 @@ export default function FieldEdit({ method, field }) {
           />
         </div>
       </div>
-
       <div className="flex flex-wrap -mx-3">
         <div className="w-full px-3">
           <label
@@ -188,7 +257,7 @@ export default function FieldEdit({ method, field }) {
             Example
           </label>
           <input
-            className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight"
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
             id="example"
             name="example"
             type="txt"
@@ -196,7 +265,6 @@ export default function FieldEdit({ method, field }) {
           />
         </div>
       </div>
-
       <div className="flex flex-wrap -mx-3">
         <div className="w-full px-3">
           <label
@@ -206,12 +274,56 @@ export default function FieldEdit({ method, field }) {
             Description
           </label>
           <input
-            className="appearance-none block w-full min-h-12 bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight"
+            className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
             id="description"
             name="description"
             type="text"
             defaultValue={field ? field.description : ""}
           />
+        </div>
+      </div>
+      <div className="flex flex-wrap -mx-3">
+        <div className="w-full px-3">
+          {/* If there's a stored file and no new uploaded file from the FileUploader, show a visible text input.
+        The user can clear this field to remove the file. */}
+          {field.uploadedFile && !uploadedFile && (
+            <div className="mt-2">
+              <label
+                htmlFor="storedFile"
+                className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2"
+              >
+                Currently Stored File (delete to remove or upload a new one to
+                replace):
+              </label>
+              <input
+                type="text"
+                id="storedFile"
+                name="uploadedFile"
+                defaultValue={field.uploadedFile}
+                className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
+                placeholder="Clear to delete file"
+              />
+            </div>
+          )}
+          <label
+            className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2"
+            htmlFor="fileUpload"
+          >
+            File Upload
+          </label>
+
+          <div className="w-full">
+            <FileUploader ofid={ofid} bgColor={bgColor} />
+          </div>
+          {/* If a new file is uploaded, use that filename via a hidden input */}
+          {uploadedFile && (
+            <input
+              type="hidden"
+              id="fileUpload"
+              name="uploadedFile"
+              value={uploadedFile.filename}
+            />
+          )}
         </div>
       </div>
     </Form>

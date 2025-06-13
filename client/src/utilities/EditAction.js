@@ -3,8 +3,10 @@ import { redirect } from "react-router";
 // This action function is used in the Create and Edit routes
 export async function action({ request, params }) {
   const method = request.method;
-
   const data = await request.formData();
+
+  let tags = data.getAll("tags");
+  tags = [...new Set(tags)]; // Remove duplicates
 
   const fieldData = {
     ofid: data.get("ofid"),
@@ -13,11 +15,12 @@ export async function action({ request, params }) {
     description: data.get("description"),
     values: data.get("values"),
     level: data.get("level"),
-    tags: data.get("tags"),
+    tags: tags,
     example: data.get("example"),
     linkReference: data.get("linkReference"),
     introduced: data.get("introduced"),
-    depricated: data.get("depricated"),
+    deprecated: data.get("deprecated"),
+    uploadedFile: data.get("uploadedFile"),
   };
 
   // Change the URL based on host

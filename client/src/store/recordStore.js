@@ -6,8 +6,8 @@ export const useRecordStore = create((set, get) => ({
     currentPage: 0,
     currentPageSize: 0,
     currentSorting: [],
-    currentRecord: 0,
     currentFilter: "",
+    currentRecord: 0,
   },
 
   setListParams: (params) => {
@@ -27,6 +27,6 @@ export const useRecordStore = create((set, get) => ({
   setCurrentPage: (page) => set({ currentPage: page }),
   setCurrentPageSize: (pageSize) => set({ currentPageSize: pageSize }),
   setCurrentSorting: (sorting) => set({ currentSorting: sorting }),
-  setCurrentRecord: (record) => set({ currentRecord: record }),
   setCurrentFilter: (filter) => set({ currentFilter: filter }),
+  setCurrentRecord: (record) => set({ currentRecord: record }),
 }));

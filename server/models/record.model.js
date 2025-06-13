@@ -22,9 +22,40 @@ const recordSchema = new mongoose.Schema({
   level: {
     type: String,
   },
-  tags: {
-    type: ["String"],
-  },
+  tags: [
+    {
+      type: String,
+      enum: [
+        "Country-AT",
+        "Country-BE",
+        "Country-CH",
+        "Country-DE",
+        "Country-DK",
+        "Country-FR",
+        "Country-GB",
+        "Country-IE",
+        "Country-IT",
+        "Country-LI",
+        "Country-LU",
+        "Country-NL",
+        "Deprecated",
+        "Draft",
+        "Dynamic Data",
+        "Experimental",
+        "FinDatex-CEPT",
+        "FinDatex-EET",
+        "FinDatex-EMT",
+        "FinDatex-EPT",
+        "FinDatex-TPT",
+        "Internal",
+        "Public",
+        "Private",
+        "Stable",
+        "Under Review",
+      ],
+      required: false,
+    },
+  ],
   example: {
     type: String,
   },
@@ -35,8 +66,11 @@ const recordSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  debricated: {
+  deprecated: {
     type: Number,
+  },
+  uploadedFile: {
+    type: String,
   },
 });
 
