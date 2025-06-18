@@ -24,7 +24,7 @@
     "mongodb": "^6.8.1",
     "mongoose": "^8.13.2",
     "multer": "^2.0.1",
-    "xlsx": "^0.18.5"
+    "xlsx": "file:vendor/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

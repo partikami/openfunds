@@ -1,7 +1,13 @@
 import path from "path";
-import fs from "fs";
+// import fs from "fs";
 import multer from "multer";
 import { fileURLToPath } from "url";
+import csvParser from "csv-parser";
+import XLSX from "xlsx";
+import { readFile, writeFile, set_fs } from "xlsx";
+import * as fs from "fs";
+
+set_fs(fs); // Set the fs module for XLSX
 
 // Get the current directory name
 const __filename = fileURLToPath(import.meta.url);
@@ -79,6 +85,90 @@ export const uploadFile = (req, res) => {
         mimetype: req.file.mimetype,
       },
     });
+  });
+};
+
+// Upload a CSV file
+export const uploadCSVFile = (req, res) => {
+  uploadMiddleware(req, res, function (err) {
+    if (err) {
+      console.error("Error during CSV file upload:", err);
+      return res.status(err instanceof multer.MulterError ? 400 : 500).json({
+        message: "CSV file upload error",
+        error: err.message,
+      });
+    }
+
+    if (
+      !req.file ||
+      path.extname(req.file.originalname).toLowerCase() !== ".csv"
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Please upload a valid CSV file" });
+    }
+
+    // Parse the CSV file
+    const results = [];
+    fs.createReadStream(req.file.path)
+      .pipe(csvParser())
+      .on("data", (data) => results.push(data))
+      .on("end", () => {
+        res.status(200).json({
+          message: "CSV file uploaded and parsed successfully",
+          data: results,
+        });
+      })
+      .on("error", (error) => {
+        console.error("Error parsing CSV file:", error);
+        res.status(500).json({ message: "Error parsing CSV file", error });
+      });
+  });
+};
+
+// Upload an XLSX file
+export const uploadXLSXFile = (req, res) => {
+  uploadMiddleware(req, res, function (err) {
+    if (err) {
+      console.error("Error during XLSX file upload:", err);
+      return res.status(err instanceof multer.MulterError ? 400 : 500).json({
+        message: "XLSX file upload error",
+        error: err.message,
+      });
+    }
+
+    if (
+      !req.file ||
+      path.extname(req.file.originalname).toLowerCase() !== ".xlsx"
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Please upload a valid XLSX file" });
+    }
+
+    try {
+      const filePath = path.join(__dirname, "../../uploads", req.file.filename);
+      console.log("Resolved file path:", filePath);
+      if (!fs.existsSync(filePath)) {
+        throw new Error("File not found: " + filePath);
+      }
+
+      const workbook = XLSX.readFile(filePath, {
+        cellDates: true,
+        cellText: false,
+      });
+
+      const sheetName = workbook.SheetNames[0];
+      const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+      res.status(200).json({
+        message: "XLSX file uploaded and parsed successfully",
+        data: data,
+      });
+    } catch (error) {
+      console.error("Error parsing XLSX file:", error);
+      res.status(500).json({ message: "Error parsing XLSX file", error });
+    }
   });
 };
 
