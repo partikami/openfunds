@@ -55,11 +55,11 @@ const upload = multer({
 // Create middleware for file upload
 const uploadMiddleware = upload.single("file");
 
-// Upload a file with error handling
+// Upload an image file with error handling
 export const uploadImageFile = (req, res) => {
   uploadMiddleware(req, res, function (err) {
     if (err) {
-      console.error("Error during file upload:", err);
+      console.error("Error during image upload:", err);
       // A Multer error occurred when uploading
       return res.status(err instanceof multer.MulterError ? 400 : 500).json({
         message: "File upload error",
