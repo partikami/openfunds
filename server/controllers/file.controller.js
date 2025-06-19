@@ -7,8 +7,6 @@ import XLSX from "xlsx";
 import { readFile, writeFile, set_fs } from "xlsx";
 import * as fs from "fs";
 
-import Field from "../models/record.model.js";
-
 set_fs(fs); // Set the fs module for XLSX
 
 // Get the current directory name
@@ -45,7 +43,7 @@ const storage = multer.diskStorage({
 
 // Configure multer with storage and file filter
 const upload = multer({
-  storage: multer.memoryStorage(), // Store file in memory
+  storage: storage,
   fileFilter: function (req, file, cb) {
     cb(null, true);
   },
@@ -54,66 +52,11 @@ const upload = multer({
   },
 });
 
-// Multer middleware for handling file uploads
-const uploadMiddleware = upload.single("jsonFile");
-
-/* 
-// Import a JSON file
-export const importJSONFile = (req, res) => {
-  const {importOption} = req.body;
-  const jsonFileBuffer = req.file.buffer;
-
-  uploadMiddleware(req, res, function (err) {
-    if (err) {
-      console.error("Error during JSON file upload:", err);
-      return res.status(err instanceof multer.MulterError ? 400 : 500).json({
-        message: "JSON file upload error",
-        error: err.message,
-      });
-    }
-
-    if (!jsonFileBuffer) {
-      return res.status(400).json({ message: 'No file uploaded.' });
-    }
-
-    let documentsToImport;
-    try {
-      documentsToImport = JSON.parse(jsonFileBuffer.toString());
-      if (!Array.isArray(documentsToImport)) {
-        return res.status(400).json({ message: 'JSON file must contain an array of documents.' });
-      }
-    } catch (error) {
-      return res.status(400).json({ message: 'Invalid JSON file.', error: error.message });
-    }
-
-  });
-
-  try {
-    switch (importOption) {
-      case 'deleteAllAndImport':
-        await Field.deleteMany({});
-        await Field.insertMany(documentsToImport);
-        return res.status(200).json({ message: 'All existing documents deleted and new documents imported successfully.' });
-
-      case 'skipExisting':
-        const existingDocuments = await Field.find({ _id: { $in: documentsToImport.map(doc => doc._id) } });
-        const newDocuments = documentsToImport.filter(doc => !existingDocuments.some(existing => existing._id.equals(doc._id)));
-        await Field.insertMany(newDocuments);
-        return res.status(200).json({ message: 'New documents imported successfully.', importedCount: newDocuments.length });
-
-      default:
-        return res.status(400).json({ message: 'Invalid import option.' });
-    }
-  } catch (error) {
-    console.error("Error during JSON import:", error);
-    return res.status(500).json({ message: 'Error during JSON import.', error: error.message });
-  }
-};
-
- */
+// Create middleware for file upload
+const uploadMiddleware = upload.single("file");
 
 // Upload a file with error handling
-export const uploadImageFile = (req, res) => {
+export const uploadFile = (req, res) => {
   uploadMiddleware(req, res, function (err) {
     if (err) {
       console.error("Error during file upload:", err);
@@ -205,11 +148,15 @@ export const uploadXLSXFile = (req, res) => {
 
     try {
       const filePath = path.join(__dirname, "../../uploads", req.file.filename);
+      console.log("Resolved file path:", filePath);
       if (!fs.existsSync(filePath)) {
         throw new Error("File not found: " + filePath);
       }
 
-      const workbook = XLSX.readFile(filePath);
+      const workbook = XLSX.readFile(filePath, {
+        cellDates: true,
+        cellText: false,
+      });
 
       const sheetName = workbook.SheetNames[0];
       const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);

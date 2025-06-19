@@ -1,17 +1,19 @@
 import express from "express";
 
 import {
-  uploadImageFile,
-  // importJSONFile,
-  // importCSVFile,
-  // importXLSXFile,
+  uploadFile,
+  uploadCSVFile,
+  uploadXLSXFile,
+  getFile,
+  deleteFile,
 } from "../controllers/file.controller.js";
 
 const router = express.Router();
 
-router.post("/upload-image", uploadImageFile);
-// router.post("/import-json", importJSONFile);
-// router.post("/import-csv", importCSVFile);
-// router.post("/import-xlsx", importXLSXFile);
+router.post("/upload", uploadFile);
+router.post("/upload-csv", uploadCSVFile);
+router.post("/upload-xlsx", uploadXLSXFile);
+router.get("/:filename", getFile);
+router.delete("/:filename", deleteFile);
 
 export default router;

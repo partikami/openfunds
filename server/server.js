@@ -39,8 +39,7 @@ app.use("/auth", authRoutes);
 app.use("/files", fileRoutes);
 
 app.use(express.static("public")); // serve static files from the public directory
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
-// app.use(express.static("/uploads")); // serve static files from the uploads directory
+app.use("/uploads", express.static(path.join(__dirname, "../uploads"))); // serve static files from the uploads directory
 
 // start the Express server
 app.listen(PORT, () => {

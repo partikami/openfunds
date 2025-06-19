@@ -1,7 +1,7 @@
 import { Form, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
 
-import ImageUploader from "./ImageUploader.jsx";
+import FileUploader from "./FileUploader.jsx";
 import { useFileStore } from "../store/fileStore.js";
 
 export default function FieldEdit({ method, field }) {
@@ -284,7 +284,7 @@ export default function FieldEdit({ method, field }) {
       </div>
       <div className="flex flex-wrap -mx-3">
         <div className="w-full px-3">
-          {/* If there's a stored file and no new uploaded file from the ImageUploader, show a visible text input.
+          {/* If there's a stored file and no new uploaded file from the FileUploader, show a visible text input.
         The user can clear this field to remove the file. */}
           {field.uploadedFile && !uploadedFile && (
             <div className="mt-2">
@@ -313,7 +313,7 @@ export default function FieldEdit({ method, field }) {
           </label>
 
           <div className="w-full">
-            <ImageUploader ofid={ofid} bgColor={bgColor} />
+            <FileUploader ofid={ofid} bgColor={bgColor} />
           </div>
           {/* If a new file is uploaded, use that filename via a hidden input */}
           {uploadedFile && (
