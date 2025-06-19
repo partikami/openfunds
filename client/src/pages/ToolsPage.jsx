@@ -1,4 +1,5 @@
 import FloatingShape from "../components/FloatingShape";
+import FileUploader from "../components/FileUploader";
 
 const ToolsPage = () => {
   return (
@@ -129,6 +130,13 @@ const ToolsPage = () => {
               Flush all and import
             </label>
           </fieldset>
+          {/*           <FileUploader
+            endpoint="/api/upload"
+            bgColor="bg-gray-100"
+            className="w-64 h-36"
+            textColor="text-gray-700"
+            buttonText="Upload File"
+          /> */}
           <button className="mt-4 border border-gray-100 w-32 h-36 rounded-lg text-2xl text-bold text-gray-100 hover:bg-gray-100 hover:text-cyan-900 transition duration-300">
             Import
           </button>
