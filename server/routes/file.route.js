@@ -1,7 +1,7 @@
 import express from "express";
 
 import {
-  uploadFile,
+  uploadImageFile,
   uploadCSVFile,
   uploadXLSXFile,
   getFile,
@@ -10,7 +10,7 @@ import {
 
 const router = express.Router();
 
-router.post("/upload", uploadFile);
+router.post("/upload-image", uploadImageFile);
 router.post("/upload-csv", uploadCSVFile);
 router.post("/upload-xlsx", uploadXLSXFile);
 router.get("/:filename", getFile);

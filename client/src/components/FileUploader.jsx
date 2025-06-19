@@ -37,7 +37,7 @@ function FileUploader({ ofid, bgColor }) {
 
     try {
       const response = await axios.post(
-        "http://localhost:5050/files/upload",
+        "http://localhost:5050/files/upload-image",
         formData
       );
       // Save the server response file data to Zustand store

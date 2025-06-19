@@ -56,7 +56,7 @@ const upload = multer({
 const uploadMiddleware = upload.single("file");
 
 // Upload a file with error handling
-export const uploadFile = (req, res) => {
+export const uploadImageFile = (req, res) => {
   uploadMiddleware(req, res, function (err) {
     if (err) {
       console.error("Error during file upload:", err);
@@ -66,10 +66,6 @@ export const uploadFile = (req, res) => {
         error: err.message,
       });
     }
-
-    // Log the request for debugging
-    console.log("Request body:", req.body);
-    console.log("Uploaded file:", req.file);
 
     // File upload successful
     if (!req.file) {
