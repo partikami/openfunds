@@ -17,7 +17,7 @@ export default function FieldEdit({ method, field }) {
 
   // Only clear the uploaded file if the field doesn't have one.
   useEffect(() => {
-    if (field.uploadedFile) {
+    if (field?.uploadedFile) {
       setUploadedFile(null);
     }
   }, [setUploadedFile, field]);
@@ -286,7 +286,7 @@ export default function FieldEdit({ method, field }) {
         <div className="w-full px-3">
           {/* If there's a stored file and no new uploaded file from the FileUploader, show a visible text input.
         The user can clear this field to remove the file. */}
-          {field.uploadedFile && !uploadedFile && (
+          {field?.uploadedFile && !uploadedFile && (
             <div className="mt-2">
               <label
                 htmlFor="storedFile"
@@ -315,8 +315,9 @@ export default function FieldEdit({ method, field }) {
           <div className="w-full">
             <FileUploader ofid={ofid} bgColor={bgColor} />
           </div>
-          {/* If a new file is uploaded, use that filename via a hidden input */}
-          {uploadedFile && (
+
+          {/* Hidden input to capture uploaded file metadata */}
+          {uploadedFile?.filename && (
             <input
               type="hidden"
               id="fileUpload"

@@ -104,6 +104,11 @@ const ToolsPage = () => {
             <label for="CSV" className="pl-2">
               CSV
             </label>
+            <br />
+            <input type="radio" id="XLSX" name="format" value="XLSX" />
+            <label for="XLSX" className="pl-2">
+              XLSX
+            </label>
           </fieldset>
           <fieldset className="border border-gray-100 w-64 pl-4 pb-2 rounded-lg">
             <legend className="text-lg font-semibold text-gray-100 mb-2">

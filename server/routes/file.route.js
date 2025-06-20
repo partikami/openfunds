@@ -10,6 +10,7 @@ const __dirname = path.dirname(__filename);
 
 import {
   uploadImageFile,
+  importJSONFile,
   uploadCSVFile,
   uploadXLSXFile,
 } from "../controllers/file.controller.js";
@@ -56,6 +57,7 @@ const upload = multer({
 });
 
 router.post("/upload-image", upload.single("file"), uploadImageFile);
+router.post("/import-json", upload.single("file"), importJSONFile);
 router.post("/upload-csv", upload.single("file"), uploadCSVFile);
 router.post("/upload-xlsx", upload.single("file"), uploadXLSXFile);
 
