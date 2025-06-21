@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 
 set_fs(fs); // Set the fs module for XLSX
 
-import Field from "../models/record.model.js";
+import Openfund from "../models/record.model.js";
 
 // Get the current directory name
 const __filename = fileURLToPath(import.meta.url);
@@ -30,6 +30,25 @@ function saveUploadedFileAndRespond({ req, res, processFile }) {
   } catch (error) {
     res.status(500).json({ error: "Error processing file: " + error.message });
   }
+}
+
+//  --- Image Upload ---
+export function uploadImageFile(req, res) {
+  saveUploadedFileAndRespond({
+    req,
+    res,
+    processFile: ({ req, res }) => {
+      res.status(200).json({
+        message: "Image uploaded successfully",
+        file: {
+          filename: req.file.filename,
+          originalname: req.file.originalname,
+          size: req.file.size,
+          mimetype: req.file.mimetype,
+        },
+      });
+    },
+  });
 }
 
 // Helper to recursively convert {_id: {$oid: ...}} to ObjectId
@@ -55,25 +74,7 @@ function fixObjectIds(obj) {
   return obj;
 }
 
-//  --- Image Upload ---
-export function uploadImageFile(req, res) {
-  saveUploadedFileAndRespond({
-    req,
-    res,
-    processFile: ({ req, res }) => {
-      res.status(200).json({
-        message: "Image uploaded successfully",
-        file: {
-          filename: req.file.filename,
-          originalname: req.file.originalname,
-          size: req.file.size,
-          mimetype: req.file.mimetype,
-        },
-      });
-    },
-  });
-}
-
+// --- JSON Import ---
 export async function importJSONFile(req, res) {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded." });
@@ -90,13 +91,13 @@ export async function importJSONFile(req, res) {
     jsonData = fixObjectIds(jsonData);
 
     // Remove all documents from the openfunds collection
-    await Field.deleteMany({});
+    await Openfund.deleteMany({});
 
     // Insert the new documents
     if (Array.isArray(jsonData)) {
-      await Field.insertMany(jsonData);
+      await Openfund.insertMany(jsonData);
     } else {
-      await Field.create(jsonData);
+      await Openfund.create(jsonData);
     }
 
     return res.json({
@@ -114,102 +115,147 @@ export async function importJSONFile(req, res) {
   }
 }
 
-/* 
-export async function importJSONFile(req, res) {
-  saveUploadedFileAndRespond({
-    req,
-    res,
-    processFile: ({ req, res }) => {
-      res.status(200).json({
-        message: "JSON file upladed successfully",
-        jsonFileName: req.file.filename,
-      });
-    },
-  });
+// --- CSV Import ---
+export async function importCSVFile(req, res) {
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded." });
+  }
+
+  const fileName = req.file.filename;
+  const csvFilePath = path.join(__dirname, "../../uploads", fileName);
+
+  const results = [];
+  let responded = false; // Prevent multiple responses
 
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded." });
-    }
-    const fileName = req.file.filename;
-    const filePath = path.join(__dirname, "../uploads", fileName);
+    fs.createReadStream(csvFilePath)
+      .pipe(
+        csvParser({
+          mapHeaders: ({ header }) => header.replace(/^\uFEFF/, ""), // Remove BOM from first header
+          mapValues: ({ header, value }) =>
+            header === "tags"
+              ? value
+                  .split("|")
+                  .map((tag) => tag.trim())
+                  .filter(Boolean)
+              : value,
+        })
+      )
+      .on("data", (data) => results.push(data))
+      .on("end", async () => {
+        try {
+          // Validate required fields
+          const requiredFields = ["ofid", "fieldName", "introduced"];
+          const invalidRows = results.filter((row) =>
+            requiredFields.some(
+              (field) => !row[field] || row[field].trim() === ""
+            )
+          );
+          if (invalidRows.length > 0) {
+            responded = true;
+            return res.status(400).json({
+              error:
+                "CSV contains rows missing required fields: ofid, fieldName, introduced.",
+              invalidRows,
+            });
+          }
 
-    // Read and parse the uploaded JSON file
-    const jsonData = JSON.parse(fs.readFileSync(filePath, "utf8"));
+          // Remove all documents from the openfunds collection
+          await Openfund.deleteMany({});
 
-    // Remove all documents from the openfunds collection
-    await Field.deleteMany({});
+          // Insert the new documents
+          await Openfund.insertMany(results);
 
-    // Insert the new documents
-    // If jsonData is an array, insertMany; if it's an object, insertOne
-    if (Array.isArray(jsonData)) {
-      await Field.insertMany(jsonData);
-    } else {
-      await Field.create(jsonData);
-    }
-
-    res.json({
-      message:
-        "JSON file uploaded and openfunds collection replaced successfully.",
-      filename: fileName,
-      count: Array.isArray(jsonData) ? jsonData.length : 1,
-    });
+          if (!responded) {
+            responded = true;
+            responded = true;
+            return res.json({
+              message:
+                "CSV file imported and openfunds collection replaced successfully.",
+              filename: fileName,
+              count: results.length,
+            });
+          }
+        } catch (error) {
+          if (!responded) {
+            responded = true;
+            return res
+              .status(500)
+              .json({ error: "Error importing CSV data: " + error.message });
+          }
+        }
+      })
+      .on("error", (error) => {
+        if (!responded) {
+          responded = true;
+          return res
+            .status(500)
+            .json({ error: "Error processing CSV file: " + error.message });
+        }
+      });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Error processing JSON file: " + error.message });
+    if (!responded) {
+      responded = true;
+      return res
+        .status(500)
+        .json({ error: "Error processing CSV file: " + error.message });
+    }
   }
 }
 
+// --- XLSX Import ---
+export async function importXLSXFile(req, res) {
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded." });
+  }
 
-// --- JSON Upload ---
-export function uploadJSONFile(req, res) {
-  saveUploadedFileAndRespond({
-    req,
-    res,
-    processFile: ({ req, res }) => {
-      res.status(200).json({
-        message: "JSON file upladed successfully",
-        jsonFileName: req.file.filename,
-      });
-    },
-  });
+  const fileName = req.file.filename;
+  const xlsxFilePath = path.join(__dirname, "../../uploads", fileName);
+
+  try {
+    // Read and parse the XLSX file
+    const workbook = XLSX.readFile(xlsxFilePath);
+    const sheetName = workbook.SheetNames[0];
+    let jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+    // Handle tags column as pipe-separated values
+    jsonData = jsonData.map((row) => ({
+      ...row,
+      tags:
+        typeof row.tags === "string"
+          ? row.tags
+              .split("|")
+              .map((tag) => tag.trim())
+              .filter(Boolean)
+          : Array.isArray(row.tags)
+          ? row.tags
+          : [],
+    }));
+
+    // Remove all documents from the openfunds collection
+    await Openfund.deleteMany({});
+
+    // Insert the new documents
+    await Openfund.insertMany(jsonData);
+
+    return res.json({
+      message:
+        "XLSX file imported and openfunds collection replaced successfully.",
+      filename: fileName,
+      count: jsonData.length,
+    });
+  } catch (error) {
+    if (!res.headersSent) {
+      return res
+        .status(500)
+        .json({ error: "Error processing XLSX file: " + error.message });
+    }
+  }
 }
- */
 
-// --- CSV Upload ---
-export function uploadCSVFile(req, res) {
-  saveUploadedFileAndRespond({
-    req,
-    res,
-    processFile: ({ fileName, filePath, res }) => {
-      const jsonFileName = fileName.replace(/\.csv$/i, ".json");
-      const jsonFilePath = path.join(__dirname, "../../uploads", jsonFileName);
-      const results = [];
-
-      fs.createReadStream(filePath)
-        .pipe(csvParser())
-        .on("data", (data) => results.push(data))
-        .on("end", () => {
-          fs.writeFileSync(jsonFilePath, JSON.stringify(results, null, 2));
-          res.json({
-            message: "CSV file uploaded and converted to JSON successfully",
-            csvFile: fileName,
-            jsonFile: jsonFileName,
-            data: results,
-          });
-        })
-        .on("error", (error) => {
-          res
-            .status(500)
-            .json({ error: "Error processing CSV file: " + error.message });
-        });
-    },
-  });
-}
-
-// --- XLSX Upload ---
-export function uploadXLSXFile(req, res) {
+/* 
+// --- XLSX Import ---
+export function importXLSXFile(req, res) {
   saveUploadedFileAndRespond({
     req,
     res,
@@ -240,3 +286,4 @@ export function uploadXLSXFile(req, res) {
     },
   });
 }
+ */

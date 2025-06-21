@@ -11,8 +11,8 @@ const __dirname = path.dirname(__filename);
 import {
   uploadImageFile,
   importJSONFile,
-  uploadCSVFile,
-  uploadXLSXFile,
+  importCSVFile,
+  importXLSXFile,
 } from "../controllers/file.controller.js";
 
 const router = express.Router();
@@ -58,7 +58,7 @@ const upload = multer({
 
 router.post("/upload-image", upload.single("file"), uploadImageFile);
 router.post("/import-json", upload.single("file"), importJSONFile);
-router.post("/upload-csv", upload.single("file"), uploadCSVFile);
-router.post("/upload-xlsx", upload.single("file"), uploadXLSXFile);
+router.post("/import-csv", upload.single("file"), importCSVFile);
+router.post("/import-xlsx", upload.single("file"), importXLSXFile);
 
 export default router;
