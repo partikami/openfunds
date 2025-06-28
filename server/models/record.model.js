@@ -91,6 +91,7 @@ const recordSchema = new mongoose.Schema({
         "Legal structure",
         "LI",
         "LU",
+        "many",
         "MiFID II data",
         "MiFID II target market",
         "Multiple country field (XX=ISO country code)",

@@ -8,7 +8,7 @@ export default function FieldEdit({ method, field }) {
   const navigate = useNavigate();
   const [ofid, setOfid] = useState(field ? field.ofid : "");
 
-  // THIS IS NEW: Create a state for tags, defaulting to the field's tags if any.
+  // Create a state for tags, defaulting to the field's tags if any.
   const [selectedTags, setSelectedTags] = useState(field?.tags || []);
 
   // Access both the uploaded file and its setter from Zustand
@@ -31,7 +31,7 @@ export default function FieldEdit({ method, field }) {
     ? "bg-yellow-100"
     : "bg-gray-200";
 
-  // THIS IS NEW: Update state when tags are changed.
+  // Update state when tags are changed.
   function handleTagsChange(e) {
     const options = e.target.options;
     const selected = [];
