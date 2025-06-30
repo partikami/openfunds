@@ -79,7 +79,11 @@ const ToolsPage = () => {
     ) {
       toast.error(
         `Selected file type (.${extension}) does not match the chosen format (${importFileFormat.toUpperCase()}).`,
-        { duration: 4000, position: "top-center" }
+        {
+          duration: 4000,
+          position: "top-center",
+          className: "whitespace-pre-line",
+        }
       );
       return;
     }
@@ -89,7 +93,7 @@ const ToolsPage = () => {
     if (importFileFormat === "csv") {
       url = "http://localhost:5050/files/import-csv";
     } else if (importFileFormat === "xlsx") {
-      url = "https://localhost:5050/files/import-xlsx";
+      url = "http://localhost:5050/files/import-xlsx";
     }
 
     const formData = new FormData();
@@ -103,18 +107,29 @@ const ToolsPage = () => {
       const response = await axios.post(url, formData);
 
       if (response.status === 200) {
-        setMessage("Import successful!");
-        toast.success(message + "\n" + " " + response.data.message, {
+        setMessage(""); // Clear previous messages
+        toast.success("Import successful!\n" + " " + response.data.message, {
           duration: 4000,
           position: "top-center",
+          className: "whitespace-pre-line",
         });
         console.log("Import successful:", response.data);
       } else {
-        setMessage("Import failed.");
+        setMessage("Import failed:");
       }
     } catch (error) {
       console.error("Error importing file:", error);
-      setMessage("Error importing file.");
+      setMessage("Error importing file!");
+      // Show toast with backend error message if available
+      const backendMsg =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Unknown error";
+      toast.error("Import failed!\n" + backendMsg, {
+        duration: 5000,
+        position: "top-center",
+      });
     }
   };
 
@@ -193,9 +208,9 @@ const ToolsPage = () => {
               title="Import Option"
               name="importOption"
               options={[
-                { label: "Delete & Import", value: "deleteAllAndImport" },
-                { label: "Skip", value: "skipExisting" },
-                { label: "Replace", value: "replaceExisting" },
+                { label: "Rebuild", value: "deleteAllAndImport" },
+                { label: "Skip existing", value: "skipExisting" },
+                { label: "Replace existing", value: "replaceExisting" },
               ]}
               selectedValue={importOption}
               onChange={(e) => setImportOption(e.target.value)}
@@ -248,16 +263,31 @@ const ToolsPage = () => {
               name="exportContent"
               options={[
                 { label: "Public", value: "public" },
-                { label: "Also Internal", value: "includedInternal" },
-                { label: "Next Version", value: "nextVersion" }, // Added for example
+                { label: "Plus internal", value: "includedInternal" },
+                { label: "Next version(s) only", value: "nextVersion" }, // Added for example
               ]}
               selectedValue={exportContent}
               onChange={(e) => setExportContent(e.target.value)}
             />
 
-            {/* Spacer to push the button down on lg and up*/}
-            <div className="flex-none lg:flex-1" />
+            <div className="">
+              <label
+                htmlFor="currentVersion"
+                className="font-bold text-gray-100 text-lg"
+              >
+                Version:
+              </label>
+              <input
+                type="text"
+                id="currentVersion"
+                name="currentVersion"
+                className="mt-2 w-[6rem]  text-lg font-bold flex items-center px-4 py-1 bg-cyan-700 text-gray-100 border border-gray-300 rounded-lg cursor-pointer shadow-sm hover:bg-gray-100 hover:text-gray-700 transition-colors duration-300 ease-in-out"
+              />
+            </div>
 
+            {/* Spacer to push the button down on lg and up
+            <div className="flex-none lg:flex-1" />
+*/}
             <button
               type="button"
               onClick={handleExport}
