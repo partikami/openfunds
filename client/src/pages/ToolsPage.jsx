@@ -4,6 +4,27 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 import FloatingShape from "../components/FloatingShape";
+import { parseSemanticVersion } from "../utilities/VersionHelper";
+
+// Helper component for a single radio group
+const RadioGroup = ({ title, name, options, selectedValue, onChange }) => (
+  <div className="mb-4 bg-gray-50 p-4 rounded-md border border-gray-200">
+    <h3 className="text-lg font-medium mb-2 text-gray-800">{title}:</h3>
+    {options.map((option) => (
+      <label key={option.value} className="inline-flex items-center mr-6 mb-2">
+        <input
+          type="radio"
+          name={name}
+          value={option.value}
+          checked={selectedValue === option.value}
+          onChange={onChange}
+          className="form-radio h-4 w-4 text-cyan-700 border-gray-300 focus:ring-blue-500"
+        />
+        <span className="ml-1 text-gray-700">{option.label}</span>
+      </label>
+    ))}
+  </div>
+);
 
 // Handler for file input component
 const FileInput = ({ onFileChange, fileName, className = "" }) => {
@@ -41,19 +62,15 @@ const ToolsPage = () => {
   const [importFileFormat, setImportFileFormat] = useState("json"); // Default value
   const [importOption, setImportOption] = useState("deleteAllAndImport"); // Default value
   const [importFile, setImportFile] = useState(null);
-  const [message, setMessage] = useState("");
+  const [exportVersion, setExportVersion] = useState(""); // State for export version
+  const [wrongInput, setWrongInput] = useState(false); // State for wrong input
+  const [message, setMessage] = useState(""); // State for messages
+
+  // --- DATA IMPORT ---
 
   const handleFileChange = (event) => {
     setImportFile(event.target.files[0]);
     setMessage(""); // Clear previous messages
-  };
-
-  const handleExport = () => {
-    console.log("Initiating Export...");
-    console.log("Export File Format:", exportFileFormat);
-    console.log("Export Content:", exportContent);
-    // Add your export API call logic here
-    // Example: fetch('/api/export', { method: 'POST', body: JSON.stringify({ format: exportFileFormat, content: exportContent }) });
   };
 
   const handleImport = async () => {
@@ -133,28 +150,68 @@ const ToolsPage = () => {
     }
   };
 
-  // Helper component for a single radio group
-  const RadioGroup = ({ title, name, options, selectedValue, onChange }) => (
-    <div className="mb-4 bg-gray-50 p-4 rounded-md border border-gray-200">
-      <h3 className="text-lg font-medium mb-2 text-gray-800">{title}:</h3>
-      {options.map((option) => (
-        <label
-          key={option.value}
-          className="inline-flex items-center mr-6 mb-2"
-        >
-          <input
-            type="radio"
-            name={name}
-            value={option.value}
-            checked={selectedValue === option.value}
-            onChange={onChange}
-            className="form-radio h-4 w-4 text-cyan-700 border-gray-300 focus:ring-blue-500"
-          />
-          <span className="ml-1 text-gray-700">{option.label}</span>
-        </label>
-      ))}
-    </div>
-  );
+  // --- DATA EXPORT ---
+
+  // Handler for export version input change
+  const handleExportVersionChange = (e) => {
+    setExportVersion(e.target.value); // Update the export version state
+    setWrongInput(false); // Reset wrong input state
+  };
+
+  // Handler for export version input blur event
+  const handleExportVersionBlur = (e) => {
+    const input = e.target.value;
+    const parsedVer = parseSemanticVersion(input);
+    if (input && !parsedVer) {
+      setWrongInput(true);
+    } else {
+      setWrongInput(false);
+    }
+  };
+
+  const handleExport = async () => {
+    console.log("Initiating Export...");
+    console.log("Export File Format:", exportFileFormat);
+    console.log("Export Content:", exportContent);
+
+    // Add your export API call logic here
+    // Example: fetch('/api/export', { method: 'POST', body: JSON.stringify({ format: exportFileFormat, content: exportContent }) });
+
+    let url = "http://localhost:5050/files/export-json";
+    if (exportFileFormat === "csv") {
+      url = "http://localhost:5050/files/export-csv";
+    } else if (exportFileFormat === "xml") {
+      url = "http://localhost:5050/files/export-xml";
+    } else if (exportFileFormat === "pdf") {
+      url = "http://localhost:5050/files/export-pdf";
+    }
+
+    // Make the API call for export
+    try {
+      const response = await axios.post(url, {
+        format: exportFileFormat,
+        content: exportContent,
+      });
+
+      if (response.status === 200) {
+        toast.success("Export successful!", {
+          duration: 4000,
+          position: "top-center",
+        });
+      } else {
+        toast.error("Export failed!", {
+          duration: 4000,
+          position: "top-center",
+        });
+      }
+    } catch (error) {
+      console.error("Error exporting file:", error);
+      toast.error("Export failed!\n" + error.message, {
+        duration: 5000,
+        position: "top-center",
+      });
+    }
+  };
 
   return (
     <div className="min-h-[800px] h-full  border border-t-0 border-gray-100 bg-gradient-to-br from-cyan-900 via-cyan-800 to-cyan-900 flex flex-col relative overflow-hidden">
@@ -263,26 +320,41 @@ const ToolsPage = () => {
               name="exportContent"
               options={[
                 { label: "Public", value: "public" },
-                { label: "Plus internal", value: "includedInternal" },
-                { label: "Next version(s) only", value: "nextVersion" }, // Added for example
+                { label: "Plus internal", value: "all" },
+                { label: "Next version(s) only", value: "next" },
               ]}
               selectedValue={exportContent}
               onChange={(e) => setExportContent(e.target.value)}
             />
 
-            <div className="">
+            <div>
               <label
-                htmlFor="currentVersion"
+                htmlFor="exportVersion"
                 className="font-bold text-gray-100 text-lg"
               >
                 Version:
               </label>
-              <input
-                type="text"
-                id="currentVersion"
-                name="currentVersion"
-                className="mt-2 w-[6rem]  text-lg font-bold flex items-center px-4 py-1 bg-cyan-700 text-gray-100 border border-gray-300 rounded-lg cursor-pointer shadow-sm hover:bg-gray-100 hover:text-gray-700 transition-colors duration-300 ease-in-out"
-              />
+              <div className="flex flex-row items-center gap-4">
+                <input
+                  type="text"
+                  id="exportVersion"
+                  name="exportVersion"
+                  value={exportVersion}
+                  placeholder="e.g., 1.2.3-beta.1"
+                  onChange={handleExportVersionChange}
+                  onBlur={handleExportVersionBlur}
+                  className="mt-2 w-[12rem]  text-lg font-bold flex items-center px-4 py-1 bg-cyan-700 text-gray-100 border border-gray-300 rounded-lg cursor-pointer shadow-sm hover:bg-gray-100 hover:text-gray-700 transition-colors duration-300 ease-in-out"
+                />
+                <div
+                  className={`mt-2 ${
+                    wrongInput ? "text-red-300" : "text-gray-100"
+                  }`}
+                >
+                  {wrongInput
+                    ? "Wrong format. Please use semantic versioning\n (e.g., 1.2.3, 1.2.3-beta.1)."
+                    : "Keep empty for the latest version"}
+                </div>
+              </div>
             </div>
 
             {/* Spacer to push the button down on lg and up

@@ -1,3 +1,4 @@
+/* 
 import express from "express";
 
 import {
@@ -17,3 +18,4 @@ router.patch("/:id", updateOne); // Update a record by id
 router.delete("/:id", deleteOne); // Delete a record by id
 
 export default router;
+ */
