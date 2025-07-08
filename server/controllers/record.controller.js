@@ -28,6 +28,24 @@ export const createOne = async (req, res) => {
     deprecated,
   } = req.body;
 
+  // Parse introduced if it's a stringified array
+  if (typeof introduced === "string" && introduced.startsWith("[")) {
+    try {
+      introduced = JSON.parse(introduced);
+    } catch (e) {
+      return res.status(400).send("Invalid introduced version format");
+    }
+  }
+
+  // Parse deprecated if it's a stringified array
+  if (typeof deprecated === "string" && deprecated.startsWith("[")) {
+    try {
+      deprecated = JSON.parse(deprecated);
+    } catch (e) {
+      return res.status(400).send("Invalid deprecated version format");
+    }
+  }
+
   // Validate the input data
   if (!ofid || !fieldName || !introduced) {
     return res
@@ -105,10 +123,47 @@ export const readOne = async (req, res) => {
 export const updateOne = async (req, res) => {
   const ofField = await getDocumentById(Field, req.params.id, res);
   if (ofField) {
+    let update = req.body;
+
+    console.log(req.body);
+    console.log(update);
+
+    // Parse introduced if it's a stringified array
+    // console.log("introduced:" update.introduced);
+    // console.log("introducedArray:" update.introducedArray);
+    if (
+      typeof update.introducedArray === "string" &&
+      update.introducedArray.startsWith("[")
+    ) {
+      try {
+        update.introduced = JSON.parse(update.introducedArray);
+        delete update.introducedArray;
+        // Remove the string field so only the array remains
+        console.log(update.introduced);
+      } catch (error) {
+        return res.status(400).send("Invalid introduced version format");
+      }
+    }
+
+    // Parse deprecated if it's a stringified array
+    if (
+      typeof update.deprecatedArray === "string" &&
+      update.deprecatedArray.startsWith("[")
+    ) {
+      try {
+        update.deprecated = JSON.parse(update.deprecatedArray);
+        delete update.deprecatedArray;
+        // Remove the string field so only the array remains
+        // if (typeof update.deprecated === "string") delete update.deprecated;
+      } catch (error) {
+        return res.status(400).send("Invalid deprecated version format");
+      }
+    }
+
     try {
       const updatedOfField = await Field.findByIdAndUpdate(
         req.params.id,
-        req.body,
+        update,
         {
           new: true,
           runValidators: true,

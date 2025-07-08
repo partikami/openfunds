@@ -7,7 +7,8 @@ import path from "path";
 import connectDB from "./db/connectDB.js";
 import recordRoutes from "./routes/record.route.js";
 import authRoutes from "./routes/auth.route.js";
-import fileRoutes from "./routes/file.route.js";
+import importRoutes from "./routes/import.route.js";
+import exportRoutes from "./routes/export.route.js";
 
 const PORT = process.env.PORT || 5050;
 const app = express();
@@ -29,11 +30,13 @@ app.use(
 );
 
 app.use(express.json()); // for parsing incoming JSON requests: req.body
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // for parsing incoming cookies
 
 app.use("/record", recordRoutes);
 app.use("/auth", authRoutes);
-app.use("/files", fileRoutes);
+app.use("/import", importRoutes);
+app.use("/export", exportRoutes);
 
 app.use(express.static("public")); // serve static files from the public directory
 app.use("/uploads", express.static(path.join(__dirname, "../uploads"))); // serve static files from the uploads directory

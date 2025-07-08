@@ -13,7 +13,7 @@ import {
   importJSONFile,
   importCSVFile,
   importXLSXFile,
-} from "../controllers/file.controller.js";
+} from "../controllers/import.controller.js";
 
 const router = express.Router();
 

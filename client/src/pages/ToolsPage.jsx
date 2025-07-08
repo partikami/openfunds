@@ -4,7 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 import FloatingShape from "../components/FloatingShape";
-import { parseSemanticVersion } from "../utilities/VersionHelper";
+import { parseSemanticVersion } from "../utilities/versionHelper.js";
 
 // Helper component for a single radio group
 const RadioGroup = ({ title, name, options, selectedValue, onChange }) => (
@@ -58,10 +58,11 @@ const FileInput = ({ onFileChange, fileName, className = "" }) => {
 const ToolsPage = () => {
   // State variables for import/export options and file handling
   const [exportFileFormat, setExportFileFormat] = useState("json"); // Default value
-  const [exportContent, setExportContent] = useState("public"); // Default value
+  const [exportFilter, setExportFilter] = useState("public"); // Default value
   const [importFileFormat, setImportFileFormat] = useState("json"); // Default value
   const [importOption, setImportOption] = useState("deleteAllAndImport"); // Default value
   const [importFile, setImportFile] = useState(null);
+  const [exportVersionInput, setExportVersionInput] = useState(""); // Input for export version
   const [exportVersion, setExportVersion] = useState(""); // State for export version
   const [wrongInput, setWrongInput] = useState(false); // State for wrong input
   const [message, setMessage] = useState(""); // State for messages
@@ -83,7 +84,10 @@ const ToolsPage = () => {
     );
 
     if (!importFile) {
-      alert("Please select a file to import.");
+      toast.error("Please select a file to import.", {
+        duration: 5000,
+        position: "top-center",
+      });
       return;
     }
 
@@ -106,11 +110,11 @@ const ToolsPage = () => {
     }
 
     // Set the URL based on the selected file format
-    let url = "http://localhost:5050/files/import-json";
+    let url = "http://localhost:5050/import/import-json";
     if (importFileFormat === "csv") {
-      url = "http://localhost:5050/files/import-csv";
+      url = "http://localhost:5050/import/import-csv";
     } else if (importFileFormat === "xlsx") {
-      url = "http://localhost:5050/files/import-xlsx";
+      url = "http://localhost:5050/import/import-xlsx";
     }
 
     const formData = new FormData();
@@ -154,43 +158,28 @@ const ToolsPage = () => {
 
   // Handler for export version input change
   const handleExportVersionChange = (e) => {
-    setExportVersion(e.target.value); // Update the export version state
+    setExportVersionInput(e.target.value); // Update the input field value
     setWrongInput(false); // Reset wrong input state
   };
 
   // Handler for export version input blur event
   const handleExportVersionBlur = (e) => {
     const input = e.target.value;
-    const parsedVer = parseSemanticVersion(input);
-    if (input && !parsedVer) {
-      setWrongInput(true);
-    } else {
-      setWrongInput(false);
-    }
+    const parsed = parseSemanticVersion(input);
+    setExportVersion(parsed);
+    setWrongInput(input && !parsed);
   };
+  console.log("Export Version: ", exportVersion); // Log the export version
 
   const handleExport = async () => {
-    console.log("Initiating Export...");
-    console.log("Export File Format:", exportFileFormat);
-    console.log("Export Content:", exportContent);
-
-    // Add your export API call logic here
-    // Example: fetch('/api/export', { method: 'POST', body: JSON.stringify({ format: exportFileFormat, content: exportContent }) });
-
-    let url = "http://localhost:5050/files/export-json";
-    if (exportFileFormat === "csv") {
-      url = "http://localhost:5050/files/export-csv";
-    } else if (exportFileFormat === "xml") {
-      url = "http://localhost:5050/files/export-xml";
-    } else if (exportFileFormat === "pdf") {
-      url = "http://localhost:5050/files/export-pdf";
-    }
+    let url = "http://localhost:5050/export/exportFile";
 
     // Make the API call for export
     try {
       const response = await axios.post(url, {
         format: exportFileFormat,
-        content: exportContent,
+        filterOption: exportFilter,
+        filterVersion: exportVersion ? exportVersion : null, // Use parsed version or null if empty
       });
 
       if (response.status === 200) {
@@ -316,15 +305,15 @@ const ToolsPage = () => {
             />
 
             <RadioGroup
-              title="Content"
-              name="exportContent"
+              title="Filter"
+              name="exportFilter"
               options={[
                 { label: "Public", value: "public" },
                 { label: "Plus internal", value: "all" },
                 { label: "Next version(s) only", value: "next" },
               ]}
-              selectedValue={exportContent}
-              onChange={(e) => setExportContent(e.target.value)}
+              selectedValue={exportFilter}
+              onChange={(e) => setExportFilter(e.target.value)}
             />
 
             <div>
@@ -339,11 +328,11 @@ const ToolsPage = () => {
                   type="text"
                   id="exportVersion"
                   name="exportVersion"
-                  value={exportVersion}
-                  placeholder="e.g., 1.2.3-beta.1"
+                  value={exportVersionInput}
+                  placeholder="e.g., 2.18.3"
                   onChange={handleExportVersionChange}
                   onBlur={handleExportVersionBlur}
-                  className="mt-2 w-[12rem]  text-lg font-bold flex items-center px-4 py-1 bg-cyan-700 text-gray-100 border border-gray-300 rounded-lg cursor-pointer shadow-sm hover:bg-gray-100 hover:text-gray-700 transition-colors duration-300 ease-in-out"
+                  className="mt-2 w-[12rem]  text-lg flex items-center px-4 py-1 bg-cyan-700 text-gray-100 border border-gray-300 rounded-lg cursor-pointer shadow-sm hover:bg-gray-100 hover:text-gray-700 transition-colors duration-300 ease-in-out"
                 />
                 <div
                   className={`mt-2 ${
@@ -351,15 +340,12 @@ const ToolsPage = () => {
                   }`}
                 >
                   {wrongInput
-                    ? "Wrong format. Please use semantic versioning\n (e.g., 1.2.3, 1.2.3-beta.1)."
+                    ? "Please use semantic versioning:\n (major.minor.patch, e.g., 2.0.15)."
                     : "Keep empty for the latest version"}
                 </div>
               </div>
             </div>
 
-            {/* Spacer to push the button down on lg and up
-            <div className="flex-none lg:flex-1" />
-*/}
             <button
               type="button"
               onClick={handleExport}

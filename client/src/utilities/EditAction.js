@@ -19,7 +19,9 @@ export async function action({ request, params }) {
     example: data.get("example"),
     linkReference: data.get("linkReference"),
     introduced: data.get("introduced"),
+    introducedArray: data.get("introducedArray"),
     deprecated: data.get("deprecated"),
+    deprecatedArray: data.get("deprecatedArray"),
     uploadedFile: data.get("uploadedFile"),
   };
 

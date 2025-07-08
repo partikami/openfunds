@@ -30,10 +30,10 @@ import LoginPage from "./pages/LoginPage.jsx";
 import SignUpPage from "./pages/SignUpPage.jsx";
 import ToolsPage from "./pages/ToolsPage.jsx";
 
-import { loader as detailLoader } from "./utilities/DetailLoader.js";
-import { loader as recordListLoader } from "./utilities/AllRecordsLoader.js";
-import { action as editAction } from "./utilities/EditAction.js";
-import { action as deleteAction } from "./utilities/DeleteAction.js";
+import { loader as detailLoader } from "./utilities/detailLoader.js";
+import { loader as recordListLoader } from "./utilities/allRecordsLoader.js";
+import { action as deleteAction } from "./utilities/deleteAction.js";
+import { action as editAction } from "./utilities/editAction.js";
 
 // Protect routes that require authentication
 

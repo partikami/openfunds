@@ -141,15 +141,16 @@ const recordSchema = new mongoose.Schema({
     type: String,
   },
   introduced: {
-    type: Number,
+    type: mongoose.Schema.Types.Mixed,
     required: true,
   },
   deprecated: {
-    type: Number,
+    type: [mongoose.Schema.Types.Mixed],
   },
   uploadedFile: {
     type: String,
   },
 });
 
-export default mongoose.model("Record", recordSchema);
+const Record = mongoose.model("Record", recordSchema);
+export default Record;

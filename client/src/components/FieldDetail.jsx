@@ -147,7 +147,12 @@ export default function FieldDetail({ method, field }) {
           <div
             className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
           >
-            {field.introduced}
+            {/* Show array in a user readable form */}
+            {Array.isArray(field.introduced)
+              ? field.introduced
+                  .filter((v) => v !== null && v !== undefined)
+                  .join(".")
+              : field.introduced}
           </div>
         </div>
 
@@ -158,7 +163,12 @@ export default function FieldDetail({ method, field }) {
           <div
             className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
           >
-            {field.deprecated}
+            {/* Show array in a user readable form */}
+            {Array.isArray(field.deprecated)
+              ? field.deprecated
+                  .filter((v) => v !== null && v !== undefined)
+                  .join(".")
+              : field.deprecated}
           </div>
         </div>
       </div>

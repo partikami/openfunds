@@ -1,8 +1,10 @@
 import { Form, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 import FileUploader from "./FileUploader.jsx";
 import { useFileStore } from "../store/fileStore.js";
+import { parseSemanticVersion } from "../utilities/versionHelper.js";
 
 export default function FieldEdit({ method, field }) {
   const navigate = useNavigate();
@@ -10,6 +12,24 @@ export default function FieldEdit({ method, field }) {
 
   // Create a state for tags, defaulting to the field's tags if any.
   const [selectedTags, setSelectedTags] = useState(field?.tags || []);
+
+  // Create a state for the semantic versioning on the introduced field.
+  const [introducedInput, setIntroducedInput] = useState(
+    Array.isArray(field?.introduced)
+      ? field.introduced.filter((v) => v !== null && v !== undefined).join(".")
+      : field?.introduced || ""
+  );
+
+  // Create a state for the semantic version on the deprecated field.
+  const [deprecatedInput, setDeprecatedInput] = useState(
+    Array.isArray(field?.deprecated)
+      ? field.deprecated.filter((v) => v !== null && v !== undefined).join(".")
+      : field?.deprecated || ""
+  );
+
+  // Create a state for wrong version format
+  const [wrongIntroducedInput, setWrongIntroducedInput] = useState(false); // State for wrong input in Introduced field
+  const [wrongDeprecatedInput, setWrongDeprecatedInput] = useState(false); // State for wrong input in Deprecated field
 
   // Access both the uploaded file and its setter from Zustand
   const uploadedFile = useFileStore((state) => state.uploadedFile);
@@ -31,7 +51,7 @@ export default function FieldEdit({ method, field }) {
     ? "bg-yellow-100"
     : "bg-gray-200";
 
-  // Update state when tags are changed.
+  // Handler for tag selection changes.
   function handleTagsChange(e) {
     const options = e.target.options;
     const selected = [];
@@ -43,8 +63,40 @@ export default function FieldEdit({ method, field }) {
     setSelectedTags(selected);
   }
 
+  // Handler for Form submission.
+  function handleFormSubmit(e) {
+    setWrongIntroducedInput(false);
+    setWrongDeprecatedInput(false);
+
+    const parsedIntroduced = parseSemanticVersion(introducedInput);
+    if (!parsedIntroduced) {
+      e.preventDefault();
+      setWrongIntroducedInput(true);
+      toast.error(
+        "Please enter a valid semantic version\n for Introduced (e.g., 2.0.15)",
+        {
+          duration: 5000,
+          position: "top-center",
+        }
+      );
+    }
+
+    const parsedDeprecated = parseSemanticVersion(deprecatedInput);
+    if (deprecatedInput && !parsedDeprecated) {
+      e.preventDefault();
+      setWrongDeprecatedInput(true);
+      toast.error(
+        "Please enter a valid semantic version\n for Deprecated (e.g., 2.1.0)",
+        {
+          duration: 5000,
+          position: "top-center",
+        }
+      );
+    }
+  }
+
   return (
-    <Form method={method}>
+    <Form method={method} onSubmit={handleFormSubmit}>
       <div className="flow-root mb-8">
         <button
           type="submit"
@@ -200,34 +252,72 @@ export default function FieldEdit({ method, field }) {
         </div>
 
         <div className="w-full md:w-1/3 px-3">
-          <label
-            className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2"
-            htmlFor="introduced"
-          >
-            Introduced in Version
-          </label>
+          <div className="flex flex-row items-center gap-4">
+            <label
+              className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2"
+              htmlFor="introduced"
+            >
+              Introduced in Version
+            </label>
+            <div
+              className={`-mt-2 ${
+                wrongIntroducedInput ? "text-red-600" : "text-gray-100"
+              }`}
+            >
+              {" "}
+              {wrongIntroducedInput
+                ? "Use semantic versioning, e.g. 2.0.15"
+                : ""}
+            </div>
+          </div>
           <input
             className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
             id="introduced"
             name="introduced"
             type="text"
-            defaultValue={field ? field.introduced : ""}
+            value={introducedInput}
+            onChange={(e) => setIntroducedInput(e.target.value)}
+          />
+          <input
+            type="text"
+            id="introducedArray"
+            name="introducedArray"
+            value={JSON.stringify(parseSemanticVersion(introducedInput) || [])}
           />
         </div>
 
         <div className="w-full md:w-1/3 px-3">
-          <label
-            className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2"
-            htmlFor="deprecated"
-          >
-            Valid until Version
-          </label>
+          <div className="flex flex-row items-center gap-4">
+            <label
+              className="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2"
+              htmlFor="deprecated"
+            >
+              Valid until Version
+            </label>
+            <div
+              className={`-mt-2 ${
+                wrongDeprecatedInput ? "text-red-600" : "text-gray-100"
+              }`}
+            >
+              {" "}
+              {wrongDeprecatedInput
+                ? "Use semantic versioning, e.g. 2.1.0"
+                : ""}
+            </div>
+          </div>
           <input
             className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
             id="deprecated"
             name="deprecated"
             type="text"
-            defaultValue={field ? field.deprecated : ""}
+            value={deprecatedInput}
+            onChange={(e) => setDeprecatedInput(e.target.value)}
+          />
+          <input
+            type="text"
+            id="deprecatedArray"
+            name="deprecatedArray"
+            value={JSON.stringify(parseSemanticVersion(deprecatedInput) || [])}
           />
         </div>
       </div>

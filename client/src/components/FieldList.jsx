@@ -88,14 +88,52 @@ const RecordList = () => {
         size: 400,
       }),
       columnHelper.accessor("introduced", {
-        cell: (info) => <span>{info.getValue()}</span>,
+        cell: (info) => {
+          const value = info.getValue();
+          return (
+            <span>
+              {Array.isArray(value)
+                ? value.filter((v) => v !== null && v !== undefined).join(".")
+                : value}
+            </span>
+          );
+        },
         header: "In",
         size: 150,
+        sortingFn: (rowA, rowB, columnId) => {
+          const a = rowA.getValue(columnId) || [];
+          const b = rowB.getValue(columnId) || [];
+          // Compare each part of the version
+          for (let i = 0; i < 3; i++) {
+            const diff = (a[i] || 0) - (b[i] || 0);
+            if (diff !== 0) return diff;
+          }
+          return 0;
+        },
       }),
       columnHelper.accessor("deprecated", {
-        cell: (info) => <span>{info.getValue()}</span>,
+        cell: (info) => {
+          const value = info.getValue();
+          return (
+            <span>
+              {Array.isArray(value)
+                ? value.filter((v) => v !== null && v !== undefined).join(".")
+                : value}
+            </span>
+          );
+        },
         header: "Out",
-        size: 400,
+        size: 150,
+        sortingFn: (rowA, rowB, columnId) => {
+          const a = rowA.getValue(columnId) || [];
+          const b = rowB.getValue(columnId) || [];
+          // Compare each part of the version
+          for (let i = 0; i < 3; i++) {
+            const diff = (a[i] || 0) - (b[i] || 0);
+            if (diff !== 0) return diff;
+          }
+          return 0;
+        },
       }),
       columnHelper.accessor("values", {
         cell: (info) => <span>{info.getValue()}</span>,
