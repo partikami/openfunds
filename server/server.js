@@ -25,6 +25,7 @@ app.use(
     ],
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
+    exposedHeaders: ["X-Exported-Count", "Content-Disposition"],
     credentials: true,
   })
 );

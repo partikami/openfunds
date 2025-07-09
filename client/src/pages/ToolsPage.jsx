@@ -75,14 +75,6 @@ const ToolsPage = () => {
   };
 
   const handleImport = async () => {
-    console.log("Initiating Import...");
-    console.log("Import File Format:", importFileFormat);
-    console.log("Import Option:", importOption);
-    console.log(
-      "Import File:",
-      importFile ? importFile.name : "No file selected"
-    );
-
     if (!importFile) {
       toast.error("Please select a file to import.", {
         duration: 5000,
@@ -123,7 +115,6 @@ const ToolsPage = () => {
     formData.append("importOption", importOption);
 
     try {
-      console.log("Form Data:", formData);
       setMessage("Importing documents...");
       const response = await axios.post(url, formData);
 
@@ -134,7 +125,6 @@ const ToolsPage = () => {
           position: "top-center",
           className: "whitespace-pre-line",
         });
-        console.log("Import successful:", response.data);
       } else {
         setMessage("Import failed:");
       }
@@ -169,30 +159,52 @@ const ToolsPage = () => {
     setExportVersion(parsed);
     setWrongInput(input && !parsed);
   };
-  console.log("Export Version: ", exportVersion); // Log the export version
 
   const handleExport = async () => {
     let url = "http://localhost:5050/export/exportFile";
 
     // Make the API call for export
     try {
-      const response = await axios.post(url, {
-        format: exportFileFormat,
-        filterOption: exportFilter,
-        filterVersion: exportVersion ? exportVersion : null, // Use parsed version or null if empty
-      });
+      const response = await axios.post(
+        url,
+        {
+          format: exportFileFormat,
+          filterOption: exportFilter,
+          filterVersion: exportVersion ? exportVersion : null, // Use parsed version or null if empty
+        },
+        {
+          responseType: "blob", // <-- Important for file downloads!
+        }
+      );
 
-      if (response.status === 200) {
-        toast.success("Export successful!", {
-          duration: 4000,
-          position: "top-center",
-        });
-      } else {
-        toast.error("Export failed!", {
-          duration: 4000,
-          position: "top-center",
-        });
+      // Get filename from Content-Disposition header if available
+      let filename = "exported_file." + exportFileFormat; // fallback filename
+      const disposition = response.headers["content-disposition"];
+      if (disposition && disposition.indexOf("filename=") !== -1) {
+        filename = disposition
+          .split("filename=")[1]
+          .replace(/['"]/g, "")
+          .trim();
       }
+
+      // Create a blob and trigger download
+      const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = urlBlob;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(urlBlob);
+
+      const exportedCount = response.headers["x-exported-count"];
+      toast.success(
+        "Export successful!\n" + " " + exportedCount + " documents exported.",
+        {
+          duration: 4000,
+          position: "top-center",
+        }
+      );
     } catch (error) {
       console.error("Error exporting file:", error);
       toast.error("Export failed!\n" + error.message, {
@@ -297,7 +309,7 @@ const ToolsPage = () => {
               options={[
                 { label: "JSON", value: "json" },
                 { label: "CSV", value: "csv" },
-                { label: "XML", value: "xml" },
+                { label: "XLSX", value: "xlsx" },
                 { label: "PDF", value: "pdf" },
               ]}
               selectedValue={exportFileFormat}
@@ -309,8 +321,8 @@ const ToolsPage = () => {
               name="exportFilter"
               options={[
                 { label: "Public", value: "public" },
-                { label: "Plus internal", value: "all" },
-                { label: "Next version(s) only", value: "next" },
+                { label: "All (including internal)", value: "all" },
+                { label: "Next version(s) only", value: "nextVersions" },
               ]}
               selectedValue={exportFilter}
               onChange={(e) => setExportFilter(e.target.value)}
@@ -321,7 +333,9 @@ const ToolsPage = () => {
                 htmlFor="exportVersion"
                 className="font-bold text-gray-100 text-lg"
               >
-                Version:
+                {exportFilter === "nextVersions"
+                  ? "All versions above and without:"
+                  : "Up to and including version:"}
               </label>
               <div className="flex flex-row items-center gap-4">
                 <input
@@ -332,16 +346,18 @@ const ToolsPage = () => {
                   placeholder="e.g., 2.18.3"
                   onChange={handleExportVersionChange}
                   onBlur={handleExportVersionBlur}
-                  className="mt-2 w-[12rem]  text-lg flex items-center px-4 py-1 bg-cyan-700 text-gray-100 border border-gray-300 rounded-lg cursor-pointer shadow-sm hover:bg-gray-100 hover:text-gray-700 transition-colors duration-300 ease-in-out"
+                  className="mt-2 w-[16rem]  text-lg flex items-center px-4 py-1 bg-cyan-700 text-gray-100 border border-gray-300 rounded-lg cursor-pointer shadow-sm hover:bg-gray-100 hover:text-gray-700 transition-colors duration-300 ease-in-out"
                 />
                 <div
                   className={`mt-2 ${
                     wrongInput ? "text-red-300" : "text-gray-100"
                   }`}
                 >
-                  {wrongInput
+                  {exportFilter === "nextVersions" && !exportVersionInput
+                    ? "Version needed."
+                    : wrongInput
                     ? "Please use semantic versioning:\n (major.minor.patch, e.g., 2.0.15)."
-                    : "Keep empty for the latest version"}
+                    : "Keep empty for all versions."}
                 </div>
               </div>
             </div>
@@ -349,7 +365,16 @@ const ToolsPage = () => {
             <button
               type="button"
               onClick={handleExport}
-              className="w-full mt-auto bg-cyan-600 text-white hover:bg-gray-200 hover:text-gray-800 font-semibold py-3 px-6 border border-gray-300 rounded-md shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-opacity-75"
+              className={`w-full mt-auto font-semibold py-3 px-6 border border-gray-300 rounded-md shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-opacity-75
+    ${
+      exportFilter === "nextVersions" && (!exportVersionInput || wrongInput)
+        ? "bg-gray-400 text-white cursor-not-allowed"
+        : "bg-cyan-700 text-white hover:bg-gray-200 hover:text-gray-800"
+    }`}
+              disabled={
+                exportFilter === "nextVersion" &&
+                (!exportVersionInput || wrongInput)
+              }
             >
               Export Data
             </button>

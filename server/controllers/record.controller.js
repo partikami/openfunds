@@ -87,7 +87,6 @@ export const createOne = async (req, res) => {
     });
     await ofField.save();
     res.status(204).send(ofField);
-    console.log("Record created successfully:", ofField);
   } catch (err) {
     console.error(err);
     res.status(500).send("Error adding record");
@@ -125,12 +124,6 @@ export const updateOne = async (req, res) => {
   if (ofField) {
     let update = req.body;
 
-    console.log(req.body);
-    console.log(update);
-
-    // Parse introduced if it's a stringified array
-    // console.log("introduced:" update.introduced);
-    // console.log("introducedArray:" update.introducedArray);
     if (
       typeof update.introducedArray === "string" &&
       update.introducedArray.startsWith("[")
@@ -138,8 +131,6 @@ export const updateOne = async (req, res) => {
       try {
         update.introduced = JSON.parse(update.introducedArray);
         delete update.introducedArray;
-        // Remove the string field so only the array remains
-        console.log(update.introduced);
       } catch (error) {
         return res.status(400).send("Invalid introduced version format");
       }
@@ -187,7 +178,6 @@ export const deleteOne = async (req, res) => {
       if (!result) return res.status(404).send("Record not found");
       res.status(200).send(result);
     } catch (error) {
-      console.log(error);
       res.status(500).send("Error deleting record");
     }
   }

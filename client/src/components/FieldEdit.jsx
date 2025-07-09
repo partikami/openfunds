@@ -279,7 +279,7 @@ export default function FieldEdit({ method, field }) {
             onChange={(e) => setIntroducedInput(e.target.value)}
           />
           <input
-            type="text"
+            type="hidden"
             id="introducedArray"
             name="introducedArray"
             value={JSON.stringify(parseSemanticVersion(introducedInput) || [])}
@@ -314,7 +314,7 @@ export default function FieldEdit({ method, field }) {
             onChange={(e) => setDeprecatedInput(e.target.value)}
           />
           <input
-            type="text"
+            type="hidden"
             id="deprecatedArray"
             name="deprecatedArray"
             value={JSON.stringify(parseSemanticVersion(deprecatedInput) || [])}
