@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 import semver from "semver";
 import ExportDocument from "../models/record.model.js";
 
-const uri =
-  "mongodb+srv://admin-michael:Y9lEtCH19wzb1nZ6@fields.ppvnlr8.mongodb.net/openfunds?retryWrites=true&w=majority&appName=records";
+const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/openfunds";
 
 async function migrateToSemVer() {
   await mongoose.connect(uri);
