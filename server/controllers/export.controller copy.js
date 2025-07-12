@@ -207,8 +207,7 @@ const exportFile = async (req, res) => {
 
       // Case for PDF export
       case "pdf":
-        const doc = new PDFDocument({ autoFirstPage: false }); // Control page creation manually
-        doc.addPage(); // Add the first page
+        const doc = new PDFDocument();
         res.setHeader("Content-Type", "application/pdf");
         res.setHeader(
           "Content-Disposition",
@@ -223,102 +222,29 @@ const exportFile = async (req, res) => {
         const filterLabel = `Filter: `.padEnd(20, ".");
         const versionLabel = `Version: `.padEnd(17, ".");
 
-        // Format filterVersion to use dots
-        const displayVersion = Array.isArray(filterVersion)
-          ? filterVersion.join(".")
-          : filterVersion || "All";
-
         doc.fontSize(12).text(`${filterLabel}${filterOption}`);
-        doc.fontSize(12).text(`${versionLabel}${displayVersion || "All"}`);
+        doc.fontSize(12).text(`${versionLabel}${filterVersion || "All"}`);
         doc.moveDown(1);
 
-        // --- Helper function to calculate an item's height before drawing ---
-        const calculateItemHeight = (item) => {
-          let totalHeight = 0;
-          const page_width =
-            doc.page.width - doc.page.margins.left - doc.page.margins.right;
-
-          // Header height
-          totalHeight += doc
-            .font("Helvetica-Bold")
-            .fontSize(12)
-            .heightOfString(item.fieldName, { width: page_width });
-          totalHeight += doc.currentLineHeight() * 0.5; // for moveDown(0.5)
-
-          // Body rows height
-          const fieldsToDraw = [
-            ["Data Type:", item.dataType],
-            ["Level:", item.level],
-            [
-              "Tags:",
-              Array.isArray(item.tags) ? item.tags.join(", ") : item.tags,
-            ],
-            ["Link Reference:", item.linkReference],
-            ["Values:", item.values],
-            ["Example:", item.example],
-            ["Introduced:", item.introduced],
-            ["Deprecated:", item.deprecated],
-            ["Uploaded File:", item.uploadedFile],
-            ["Description:", item.description],
-          ];
-
-          fieldsToDraw.forEach(([label, value]) => {
-            if (value && String(value).length > 0) {
-              // Since the label and value are on the same line, we take the height of the value
-              // as it's the part that can wrap. This is an approximation.
-              const valueHeight = doc
-                .font("Helvetica")
-                .fontSize(10)
-                .heightOfString(String(value), { width: page_width - 100 }); // Approximate value width
-              totalHeight += valueHeight;
-            }
-          });
-
-          totalHeight += doc.currentLineHeight() * 2; // for moveDown(2) at the end
-          return totalHeight;
-        };
-
         exportableDocs.forEach((item, index) => {
-          // --- Check if the item fits on the current page ---
-          const itemHeight = calculateItemHeight(item);
-          const remainingPageSpace =
-            doc.page.height - doc.page.margins.bottom - doc.y;
-
-          if (itemHeight > remainingPageSpace) {
-            doc.addPage();
-          }
-
           const headerOfid = item.ofid || "";
           const headerFieldName = item.fieldName || "";
           const bodyDataType = item.dataType || "";
-
-          // Sanitize fields that may contain carriage returns
-          const bodyDescription = (item.description || "").replace(
-            /\r\n?/g,
-            "\n"
-          );
-          const bodyValues = (
-            item.values && item.values.length ? String(item.values) : ""
-          ).replace(/\r\n?/g, "\n");
-          const bodyExample = (item.example || "").replace(/\r\n?/g, "\n");
-
+          const bodyDescription = item.description || "";
+          const bodyValues =
+            item.values && item.values.length ? item.values : "";
           const bodyLevel = item.level || "";
           const bodyTags = item.tags ? item.tags.join(", ") : "";
+          const bodyExample = item.example || "";
           const bodyLinkReference = item.linkReference || "";
-
-          // Format introduced and deprecated versions to use dots
-          const bodyIntroduced = Array.isArray(item.introduced)
-            ? item.introduced.join(".")
-            : item.introduced || "";
-          const bodyDeprecated = Array.isArray(item.deprecated)
-            ? item.deprecated.join(".")
-            : item.deprecated || "";
-
+          const bodyIntroduced = item.introduced || "";
+          const bodyDeprecated =
+            item.deprecated && item.deprecated.length ? item.deprecated : "";
           const bodyUploadedFile = item.uploadedFile || "";
 
           // Print document header
           doc.fontSize(12).text(`${headerOfid} ${headerFieldName}`);
-          doc.moveDown(0.25);
+          doc.moveDown(0.5);
 
           // --- Helper function to draw a formatted row ---
           const drawRow = (label, value, padding) => {
