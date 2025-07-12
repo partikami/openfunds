@@ -8,7 +8,7 @@ import { parseSemanticVersion } from "../utilities/versionHelper.js";
 
 // Helper component for a single radio group
 const RadioGroup = ({ title, name, options, selectedValue, onChange }) => (
-  <div className="mb-4 bg-gray-50 p-4 rounded-md border border-gray-200">
+  <div className="mb-4 bg-gray-100 p-4 rounded-md border border-gray-200">
     <h3 className="text-lg font-medium mb-2 text-gray-800">{title}:</h3>
     {options.map((option) => (
       <label key={option.value} className="inline-flex items-center mr-6 mb-2">
@@ -148,16 +148,38 @@ const ToolsPage = () => {
 
   // Handler for export version input change
   const handleExportVersionChange = (e) => {
-    setExportVersionInput(e.target.value); // Update the input field value
-    setWrongInput(false); // Reset wrong input state
+    const value = e.target.value;
+    setExportVersionInput(value);
+
+    // For "public", "all", and "nextVersions" filters:
+    if (value.trim() !== "") {
+      const parsed = parseSemanticVersion(value);
+      setWrongInput(!parsed);
+      if (parsed) {
+        setExportVersion(parsed);
+      } else {
+        setExportVersion("");
+      }
+    } else {
+      // When input is empty, clear any errors.
+      setWrongInput(false);
+      setExportVersion("");
+    }
   };
 
   // Handler for export version input blur event
   const handleExportVersionBlur = (e) => {
-    const input = e.target.value;
-    const parsed = parseSemanticVersion(input);
-    setExportVersion(parsed);
-    setWrongInput(input && !parsed);
+    const value = e.target.value;
+    if (value.trim() !== "") {
+      const parsed = parseSemanticVersion(value);
+      setWrongInput(!parsed);
+      if (parsed) {
+        setExportVersion(parsed);
+      }
+    } else {
+      setWrongInput(false);
+      setExportVersion("");
+    }
   };
 
   const handleExport = async () => {
@@ -267,8 +289,8 @@ const ToolsPage = () => {
               name="importOption"
               options={[
                 { label: "Rebuild", value: "deleteAllAndImport" },
-                { label: "Skip existing", value: "skipExisting" },
-                { label: "Replace existing", value: "replaceExisting" },
+                { label: "Skip", value: "skipExisting" },
+                { label: "Replace", value: "replaceExisting" },
               ]}
               selectedValue={importOption}
               onChange={(e) => setImportOption(e.target.value)}
@@ -321,8 +343,8 @@ const ToolsPage = () => {
               name="exportFilter"
               options={[
                 { label: "Public", value: "public" },
-                { label: "All (including internal)", value: "all" },
-                { label: "Next version(s) only", value: "nextVersions" },
+                { label: "All", value: "all" },
+                { label: "Next", value: "nextVersions" },
               ]}
               selectedValue={exportFilter}
               onChange={(e) => setExportFilter(e.target.value)}
@@ -334,8 +356,8 @@ const ToolsPage = () => {
                 className="font-bold text-gray-100 text-lg"
               >
                 {exportFilter === "nextVersions"
-                  ? "All versions above and without:"
-                  : "Up to and including version:"}
+                  ? "Versions greater than:"
+                  : "Up to and incl. version:"}
               </label>
               <div className="flex flex-row items-center gap-4">
                 <input
@@ -346,18 +368,15 @@ const ToolsPage = () => {
                   placeholder="e.g., 2.18.3"
                   onChange={handleExportVersionChange}
                   onBlur={handleExportVersionBlur}
-                  className="mt-2 w-[16rem]  text-lg flex items-center px-4 py-1 bg-cyan-700 text-gray-100 border border-gray-300 rounded-lg cursor-pointer shadow-sm hover:bg-gray-100 hover:text-gray-700 transition-colors duration-300 ease-in-out"
+                  className="mt-2 w-[12rem]  text-lg flex items-center px-4 py-1 bg-cyan-700 text-gray-100 border border-gray-300 rounded-lg cursor-pointer shadow-sm hover:bg-gray-100 hover:text-gray-700 transition-colors duration-300 ease-in-out"
                 />
-                <div
-                  className={`mt-2 ${
-                    wrongInput ? "text-red-300" : "text-gray-100"
-                  }`}
-                >
+
+                <div className={`mt-2 text-gray-100`}>
                   {exportFilter === "nextVersions" && !exportVersionInput
                     ? "Version needed."
-                    : wrongInput
+                    : exportVersionInput && wrongInput
                     ? "Please use semantic versioning:\n (major.minor.patch, e.g., 2.0.15)."
-                    : "Keep empty for all versions."}
+                    : "Empty for all versions."}
                 </div>
               </div>
             </div>
@@ -367,13 +386,20 @@ const ToolsPage = () => {
               onClick={handleExport}
               className={`w-full mt-auto font-semibold py-3 px-6 border border-gray-300 rounded-md shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-opacity-75
     ${
-      exportFilter === "nextVersions" && (!exportVersionInput || wrongInput)
+      (exportFilter === "nextVersions" &&
+        (!exportVersionInput || wrongInput)) ||
+      ((exportFilter === "public" || exportFilter === "all") &&
+        exportVersionInput &&
+        wrongInput)
         ? "bg-gray-400 text-white cursor-not-allowed"
         : "bg-cyan-700 text-white hover:bg-gray-200 hover:text-gray-800"
     }`}
               disabled={
-                exportFilter === "nextVersion" &&
-                (!exportVersionInput || wrongInput)
+                (exportFilter === "nextVersions" &&
+                  (!exportVersionInput || wrongInput)) ||
+                ((exportFilter === "public" || exportFilter === "all") &&
+                  exportVersionInput &&
+                  wrongInput)
               }
             >
               Export Data
