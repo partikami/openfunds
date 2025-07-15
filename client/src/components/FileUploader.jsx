@@ -37,12 +37,11 @@ function FileUploader({ ofid, bgColor }) {
 
     try {
       const response = await axios.post(
-        "http://localhost:5050/files/upload-image",
+        "http://localhost:5050/import/upload-image",
         formData
       );
       // Save the server response file data to Zustand store
       setUploadedFile(response.data.file);
-      console.log("File upload was successfully:", response.data.file);
       setStatus(UPLOAD_STATUS.SUCCESS);
     } catch (error) {
       console.error("Error uploading file:", error);

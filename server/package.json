@@ -21,6 +21,7 @@
     "csv-stringify": "^6.5.2",
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
+    "jszip": "^3.10.1",
     "mailtrap": "^4.0.0",
     "mongodb": "^6.8.1",
     "mongoose": "^8.13.2",

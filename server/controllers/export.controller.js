@@ -2,8 +2,13 @@ import ExportDocument from "../models/record.model.js";
 import { stringify } from "csv-stringify";
 import XLSX from "xlsx"; // XLSX for Excel file generation
 import PDFDocument from "pdfkit"; // PDFKit for PDF file generation
+import JSZip from "jszip"; // JSZip for creating zip files
+import path from "path"; // For resolving file paths
+import { fileURLToPath } from "url";
 
-// const CURRENT_VERSION = [1, 2, 4]; // Semantic version format: [major, minor, patch, build, pre-release]
+// Get the current directory name
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // --- Endpoint to export documents based on filter and format ---
 const exportFile = async (req, res) => {
@@ -58,9 +63,23 @@ const exportFile = async (req, res) => {
   }
 
   if (!documents || documents.length === 0) {
-    return res
-      .status(404)
-      .json({ message: "No documents found for the selected criteria." });
+    let errorMessage = "No documents found for the selected criteria.";
+
+    // Provide more specific error message based on filter type
+    if (filterOption === "nextVersions" && filterVersion) {
+      errorMessage = `No documents found for versions\n greater than ${
+        Array.isArray(filterVersion) ? filterVersion.join(".") : filterVersion
+      }.\n Try using a lower version number.`;
+    } else if (
+      (filterOption === "public" || filterOption === "all") &&
+      filterVersion
+    ) {
+      errorMessage = `No documents found up to\n version ${
+        Array.isArray(filterVersion) ? filterVersion.join(".") : filterVersion
+      }.\n Try using a higher version number.`;
+    }
+
+    return res.status(404).json({ message: errorMessage });
   }
 
   const exportableDocs = prepareDocumentsForExport(documents);
@@ -209,11 +228,20 @@ const exportFile = async (req, res) => {
       case "pdf":
         const doc = new PDFDocument({ autoFirstPage: false }); // Control page creation manually
         doc.addPage(); // Add the first page
-        res.setHeader("Content-Type", "application/pdf");
+
+        // Prevent browser caching
+        res.setHeader(
+          "Cache-Control",
+          "no-store, no-cache, must-revalidate, proxy-revalidate"
+        );
+        res.setHeader("Pragma", "no-cache");
+        res.setHeader("Expires", "0");
+        res.setHeader("Surrogate-Control", "no-store");
         res.setHeader(
           "Content-Disposition",
           `attachment; filename="${filename}.pdf"`
         );
+        res.setHeader("Content-Type", "application/pdf");
         res.setHeader("X-Exported-Count", exportableDocs.length);
 
         doc.pipe(res);
@@ -348,32 +376,242 @@ const exportFile = async (req, res) => {
           drawRow("Example:", bodyExample, 30);
           drawRow("Introduced:", bodyIntroduced, 29);
           drawRow("Deprecated:", bodyDeprecated, 28);
-          drawRow("Uploaded File:", bodyUploadedFile, 27);
           doc.font("Helvetica-Bold").text("Description:");
           doc.font("Helvetica").text(`${bodyDescription}`);
-          // drawRow("Description:", bodyDescription);
+          drawRow("Uploaded File:", bodyUploadedFile, 27);
 
-          /*           
-          // Print document body
-          doc
-            .fontSize(10)
-            .text(`Data Type: `.padEnd(25, ".") + `${bodyDataType}`);
-          doc.text(`Level: `.padEnd(28, ".") + `${bodyLevel}`);
-          doc.text(`Tags: `.padEnd(28, ".") + `${bodyTags}`);
-          doc.text(`Introduced: `.padEnd(25, ".") + `${bodyIntroduced}`);
-          doc.text(`Deprecated: `.padEnd(23, ".") + `${bodyDeprecated}`);
-          doc.text(`Link Reference: `.padEnd(20, ".") + `${bodyLinkReference}`);
-          doc.text(`Values: `.padEnd(25, ".") + `${bodyValues}`);
-          doc.text(`Example: `.padEnd(20, ".") + `${bodyExample}`);
-          doc.text(`Uploaded File: `.padEnd(20, ".") + `${bodyUploadedFile}`);
-          doc.text("Description:");
-          doc.text(`${bodyDescription}`);
- */
+          // Show image if uploadedFile exists and is an image
+          if (
+            bodyUploadedFile &&
+            /\.(png|jpg|jpeg|gif)$/i.test(bodyUploadedFile)
+          ) {
+            try {
+              // Use __dirname from line 10 for path resolution
+              const imagePath = path.resolve(
+                __dirname,
+                "../../uploads",
+                bodyUploadedFile
+              );
+              doc.moveDown(0.5);
+              doc.image(imagePath, {
+                fit: [480, 270], // Adjust size as needed
+                // align: "left",
+              });
+              doc.moveDown(0.5);
+            } catch (err) {
+              doc
+                .font("Helvetica")
+                .fillColor("red")
+                .text("Image not found or cannot be loaded.");
+            }
+          } else {
+            drawRow("Uploaded File:", bodyUploadedFile, 27);
+          }
+
           doc.moveDown(2);
         });
 
         doc.end();
         break;
+
+      // Case for HTML export
+      case "html":
+        res.setHeader("Content-Type", "text/html");
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename="${filename}.html"`
+        );
+        res.setHeader("X-Exported-Count", exportableDocs.length);
+        let htmlContent = `<!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Openfunds Export</title>
+          <style>
+              body {
+                  font-family: Arial, sans-serif;
+                  margin: 20px;
+              }
+              h1 {
+                  text-align: center;
+              }
+              .document {
+                  margin-bottom: 20px;
+                  padding: 10px;
+                  border: 1px solid #ccc;
+              }
+              .document h2 {
+                  margin-top: 0;
+              }
+              .document p {
+                  margin: 5px 0;
+              }
+              .document img {
+                  max-width: 100%;
+                  height: auto;
+              }
+          </style>
+      </head>
+      <body>
+          <h1>Openfunds Export</h1>
+          <p>Filter: ${filterOption}</p>
+          <p>Version: ${filterVersion ? filterVersion.join(".") : "All"}</p>`;
+
+        // Add this part to generate the actual content
+        exportableDocs.forEach((item) => {
+          htmlContent += `
+          <div class="document">
+              <h2>${item.ofid} ${item.fieldName}</h2>
+              <p><strong>Data Type:</strong> ${item.dataType || ""}</p>
+              <p><strong>Level:</strong> ${item.level || ""}</p>
+              <p><strong>Tags:</strong> ${
+                Array.isArray(item.tags)
+                  ? item.tags.join(", ")
+                  : item.tags || ""
+              }</p>
+              <p><strong>Link Reference:</strong> ${
+                item.linkReference || ""
+              }</p>
+              <p><strong>Values:</strong> ${item.values || ""}</p>
+              <p><strong>Example:</strong> ${item.example || ""}</p>
+              <p><strong>Introduced:</strong> ${
+                Array.isArray(item.introduced)
+                  ? item.introduced.join(".")
+                  : item.introduced || ""
+              }</p>
+              <p><strong>Deprecated:</strong> ${
+                Array.isArray(item.deprecated)
+                  ? item.deprecated.join(".")
+                  : item.deprecated || ""
+              }</p>
+              <p><strong>Description:</strong> ${item.description || ""}</p>`;
+
+          // Add image if it exists
+          if (
+            item.uploadedFile &&
+            /\.(png|jpg|jpeg|gif)$/i.test(item.uploadedFile)
+          ) {
+            htmlContent += `
+              <p><strong>Image:</strong></p>
+              <img src="data:image/png;base64,IMAGE_DATA_HERE" alt="${item.uploadedFile}">
+              <p><em>Note: In an actual implementation, you would need to convert the image to base64 or provide a URL.</em></p>`;
+          } else if (item.uploadedFile) {
+            htmlContent += `
+              <p><strong>Uploaded File:</strong> ${item.uploadedFile}</p>`;
+          }
+
+          htmlContent += `
+          </div>`;
+        });
+
+        // Close the HTML document
+        htmlContent += `
+      </body>
+      </html>`;
+
+        return res.send(htmlContent);
+        break;
+
+      // Case for HTML snippet export
+      case "snippet":
+        const zip = new JSZip();
+
+        // Create individual HTML files for each document
+        exportableDocs.forEach((item) => {
+          const htmlContent = `<!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>${item.ofid} ${item.fieldName}</title>
+              <style>
+                  body {
+                      font-family: Arial, sans-serif;
+                      margin: 20px;
+                      line-height: 1.6;
+                  }
+                  .document {
+                      max-width: 800px;
+                      margin: 0 auto;
+                      padding: 20px;
+                      border: 1px solid #ddd;
+                      border-radius: 8px;
+                  }
+                  .document h1 {
+                      color: #333;
+                      border-bottom: 2px solid #007acc;
+                      padding-bottom: 10px;
+                  }
+                  .document p {
+                      margin: 10px 0;
+                  }
+                  .document strong {
+                      color: #555;
+                  }
+                  .document img {
+                      max-width: 100%;
+                      height: auto;
+                      border: 1px solid #ddd;
+                      border-radius: 4px;
+                      margin: 10px 0;
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="document">
+                  <h1>${item.ofid}\n ${item.fieldName}</h1>
+                  <p><strong>Data Type:</strong> ${item.dataType || ""}</p>
+                  <p><strong>Level:</strong> ${item.level || ""}</p>
+                  <p><strong>Tags:</strong> ${
+                    Array.isArray(item.tags)
+                      ? item.tags.join(", ")
+                      : item.tags || ""
+                  }</p>
+                  <p><strong>Link Reference:</strong> ${
+                    item.linkReference || ""
+                  }</p>
+                  <p><strong>Values:</strong> ${item.values || ""}</p>
+                  <p><strong>Example:</strong> ${item.example || ""}</p>
+                  <p><strong>Introduced:</strong> ${
+                    Array.isArray(item.introduced)
+                      ? item.introduced.join(".")
+                      : item.introduced || ""
+                  }</p>
+                  <p><strong>Deprecated:</strong> ${
+                    Array.isArray(item.deprecated)
+                      ? item.deprecated.join(".")
+                      : item.deprecated || ""
+                  }</p>
+                  <p><strong>Description:</strong> ${item.description || ""}</p>
+                  ${
+                    item.uploadedFile &&
+                    /\.(png|jpg|jpeg|gif)$/i.test(item.uploadedFile)
+                      ? `<p><strong>Image:</strong></p>
+                        <img src="data:image/png;base64,IMAGE_DATA_HERE" alt="${item.uploadedFile}">
+                        <p><em>Note: In an actual implementation, you would need to convert the image to base64 or provide a URL.</em></p>`
+                      : item.uploadedFile
+                      ? `<p><strong>Uploaded File:</strong> ${item.uploadedFile}</p>`
+                      : ""
+                  }
+              </div>
+          </body>
+          </html>`;
+
+          // Add file to zip with ofid as filename
+          zip.file(`${item.ofid}.html`, htmlContent);
+        });
+
+        // Generate zip file
+        const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
+
+        res.setHeader("Content-Type", "application/zip");
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename="${filename}_snippets.zip"`
+        );
+        res.setHeader("X-Exported-Count", exportableDocs.length);
+        return res.send(zipBuffer);
 
       default:
         return res

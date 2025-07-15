@@ -329,11 +329,10 @@ export default function FieldEdit({ method, field }) {
           >
             Values
           </label>
-          <input
+          <textarea
             className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
             id="values"
             name="values"
-            type="text"
             defaultValue={field ? field.values : ""}
           />
         </div>
@@ -346,11 +345,10 @@ export default function FieldEdit({ method, field }) {
           >
             Example
           </label>
-          <input
+          <textarea
             className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
             id="example"
             name="example"
-            type="txt"
             defaultValue={field ? field.example : ""}
           />
         </div>
@@ -363,11 +361,10 @@ export default function FieldEdit({ method, field }) {
           >
             Description
           </label>
-          <input
+          <textarea
             className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
             id="description"
             name="description"
-            type="text"
             defaultValue={field ? field.description : ""}
           />
         </div>
