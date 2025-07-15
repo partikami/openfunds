@@ -129,6 +129,7 @@ const recordSchema = new mongoose.Schema({
         "Test Tags",
         "TPT",
         " TPT ",
+        "Under Review",
         "US",
       ],
       required: false,

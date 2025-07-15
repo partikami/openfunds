@@ -93,8 +93,8 @@ const ToolsPage = () => {
 
   const importOptionOptions = [
     { label: "Rebuild", value: "deleteAllAndImport" },
-    { label: "Skip", value: "skipExisting" },
-    { label: "Replace", value: "replaceExisting" },
+    { label: "Skip Existing Fields", value: "skipExisting" },
+    { label: "Replace Existing Fields", value: "replaceExisting" },
   ];
 
   // Calculate the maximum number of options across all RadioGroups
@@ -286,7 +286,7 @@ const ToolsPage = () => {
       );
     } catch (error) {
       console.error("Error exporting file:", error);
-      
+
       // Extract the specific error message from the server response
       let errorMessage = "Export failed!";
       if (error.response?.data) {
@@ -298,16 +298,18 @@ const ToolsPage = () => {
             errorMessage = errorData.message || errorMessage;
           } catch (parseError) {
             // If parsing fails, use the generic message
-            errorMessage = error.response?.data?.message || error.message || errorMessage;
+            errorMessage =
+              error.response?.data?.message || error.message || errorMessage;
           }
         } else {
           // For regular JSON responses
-          errorMessage = error.response.data.message || error.message || errorMessage;
+          errorMessage =
+            error.response.data.message || error.message || errorMessage;
         }
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       toast.error(errorMessage, {
         duration: 5000,
         position: "top-center",
