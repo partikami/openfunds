@@ -135,3 +135,6 @@ dist
 
 # Deployment instructions
 deployments.md
+
+# Some files
+migrateToSemVer.js
