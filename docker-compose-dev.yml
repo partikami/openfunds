@@ -5,7 +5,7 @@ services:
       context: ./server
       target: development
     restart: unless-stopped
-    # Excluded for portainerenv_file: ./server/config.env
+    env_file: ./server/config.env
     volumes:
       - ./server:/app
       - /app/node_modules
