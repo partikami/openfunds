@@ -1,14 +1,14 @@
 import mongoose from "mongoose";
 import semver from "semver";
-import ExportDocument from "../models/record.model.js";
+import Field from "../models/record.model.js";
 
-const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/openfunds";
+// const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/openfunds";
 
 async function migrateToSemVer() {
   await mongoose.connect(uri);
   console.log("Mongoose connected to MongoDB.");
 
-  const docs = await ExportDocument.find({ introduced: { $type: "string" } });
+  const docs = await Field.find({ introduced: { $type: "string" } });
   console.log(`Found ${docs.length} documents to process.`);
 
   for (const doc of docs) {
@@ -48,7 +48,7 @@ async function migrateToSemVer() {
       );
 
       // 3. Update the document in MongoDB
-      await ExportDocument.updateOne(
+      await Field.updateOne(
         { _id: docId },
         { $set: { introduced: introducedArray } }
       );

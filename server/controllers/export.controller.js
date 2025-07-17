@@ -1,4 +1,4 @@
-import ExportDocument from "../models/record.model.js";
+import Field from "../models/record.model.js";
 import { stringify } from "csv-stringify";
 import XLSX from "xlsx"; // XLSX for Excel file generation
 import PDFDocument from "pdfkit"; // PDFKit for PDF file generation
@@ -54,7 +54,7 @@ const exportFile = async (req, res) => {
 
   let documents;
   try {
-    documents = await ExportDocument.find(query).sort({ ofid: 1 }).lean(); // .lean() for plain JS objects
+    documents = await Field.find(query).sort({ ofid: 1 }).lean(); // .lean() for plain JS objects
   } catch (error) {
     console.error("Error fetching documents from MongoDB:", error);
     return res

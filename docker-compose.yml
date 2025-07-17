@@ -1,0 +1,28 @@
+name: openfunds
+services:
+  server:
+    build:
+      context: ./server
+      target: production
+    restart: unless-stopped
+    env_file: ./server/config.env
+    networks:
+      - openfunds-network
+    ports:
+      - "5050:5050"
+
+  client:
+    build:
+      context: ./client
+      target: production
+    restart: unless-stopped
+    networks:
+      - openfunds-network
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+
+networks:
+    openfunds-network:
+      driver: bridge

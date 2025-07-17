@@ -22,6 +22,7 @@ app.use(
     origin: [
       "https://of-client-c901ce91e892.herokuapp.com",
       "http://localhost:5173",
+      "http://localhost:3000",
     ],
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
@@ -33,6 +34,11 @@ app.use(
 app.use(express.json()); // for parsing incoming JSON requests: req.body
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // for parsing incoming cookies
+
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK!!!" });
+});
 
 app.use("/record", recordRoutes);
 app.use("/auth", authRoutes);
