@@ -137,3 +137,6 @@ uploads/
 # Extras
 .vscode/
 .DS_Store
+
+# Ignore specific files
+docker-compose-dev.yml
