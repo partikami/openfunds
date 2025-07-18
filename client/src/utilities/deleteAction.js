@@ -1,9 +1,11 @@
 import { redirect } from "react-router";
 
-// Uncomment in localhost environment. Comment out in production environment.
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5050"; // Fallback for local dev
+
 export async function action({ params, request }) {
   const id = params.id;
-  const response = await fetch("http://localhost:5050/record/" + id, {
+  const response = await fetch(`${API_BASE_URL}/api/record/${id}`, {
     method: "DELETE",
   });
 

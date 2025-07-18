@@ -1,5 +1,8 @@
 import { redirect } from "react-router";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5050"; // Fallback for local dev
+
 // This action function is used in the Create and Edit routes
 export async function action({ request, params }) {
   const method = request.method;
@@ -26,13 +29,13 @@ export async function action({ request, params }) {
   };
 
   // Change the URL based on host
-  let url = "http://localhost:5050/record";
+  let url = `${API_BASE_URL}/api/record`;
   // let url = "https://of-server-87a56a44565e.herokuapp.com/record";
 
   // Change the URL based on host
   if (method === "PATCH") {
     const id = params.id;
-    url = "http://localhost:5050/record/" + id;
+    url = `${API_BASE_URL}/api/record/${id}`;
     // url = "https://of-server-87a56a44565e.herokuapp.com/record/" + id;
   }
 

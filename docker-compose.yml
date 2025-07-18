@@ -9,6 +9,11 @@ services:
       - openfunds-network
     ports:
       - "5050:5050"
+    environment:
+      NODE_ENV: production
+      PORT: 5050
+    volumes:
+      - server-uploads:/app/uploads
 
   client:
     build:
@@ -21,7 +26,12 @@ services:
       - "3000:3000"
     depends_on:
       - server
+    environment:
+      VITE_API_BASE_URL: /api
 
 networks:
     openfunds-network:
       driver: bridge
+
+volumes:
+  server-uploads:

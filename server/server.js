@@ -42,13 +42,13 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK!!!" });
 });
 
-app.use("/record", recordRoutes);
-app.use("/auth", authRoutes);
-app.use("/import", importRoutes);
-app.use("/export", exportRoutes);
+app.use("/api/record", recordRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/import", importRoutes);
+app.use("/api/export", exportRoutes);
 
 app.use(express.static("public")); // serve static files from the public directory
-app.use("/uploads", express.static(path.join(__dirname, "../uploads"))); // serve static files from the uploads directory
+app.use("/api/uploads", express.static(path.join(__dirname, "../uploads"))); // serve static files from the uploads directory
 
 // start the Express server
 app.listen(PORT, () => {

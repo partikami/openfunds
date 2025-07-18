@@ -58,6 +58,9 @@ const FileInput = ({ onFileChange, fileName, className = "" }) => {
   );
 };
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5050"; // Fallback for local dev
+
 const ToolsPage = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated); // Get auth state from store
 
@@ -159,11 +162,11 @@ const ToolsPage = () => {
     }
 
     // Set the URL based on the selected file format
-    let url = "http://localhost:5050/import/import-json";
+    let url = `${API_BASE_URL}/api/import/import-json`;
     if (importFileFormat === "csv") {
-      url = "http://localhost:5050/import/import-csv";
+      url = `${API_BASE_URL}/api/import/import-csv`;
     } else if (importFileFormat === "xlsx") {
-      url = "http://localhost:5050/import/import-xlsx";
+      url = `${API_BASE_URL}/api/import/import-xlsx`;
     }
 
     const formData = new FormData();
@@ -240,7 +243,7 @@ const ToolsPage = () => {
   };
 
   const handleExport = async () => {
-    let url = "http://localhost:5050/export/exportFile";
+    let url = `${API_BASE_URL}/api/export/exportFile`;
 
     // Make the API call for export
     try {

@@ -10,6 +10,9 @@ const UPLOAD_STATUS = {
   ERROR: "error",
 };
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5050"; // Fallback for local dev
+
 function FileUploader({ ofid, bgColor }) {
   const [file, setFile] = useState(null);
   const [status, setStatus] = useState(UPLOAD_STATUS.IDLE);
@@ -37,7 +40,7 @@ function FileUploader({ ofid, bgColor }) {
 
     try {
       const response = await axios.post(
-        "http://localhost:5050/import/upload-image",
+        `${API_BASE_URL}/api/import/upload-image`,
         formData
       );
       // Save the server response file data to Zustand store

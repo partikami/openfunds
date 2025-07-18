@@ -138,3 +138,6 @@ deployments.md
 
 # Some files
 migrateToSemVer.js
+
+# Uploaded files
+uploads/*
