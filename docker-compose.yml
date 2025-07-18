@@ -12,6 +12,10 @@ services:
     environment:
       NODE_ENV: production
       PORT: 5050
+      ATLAS_URI: ${ATLAS_URI}
+      JWT_SECRET: ${JWT_SECRET}
+      MAILTRAP_TOKEN: ${MAILTRAP_TOKEN}
+      CLIENT_URL: http://localhost:3000
     volumes:
       - server-uploads:/app/uploads
 
