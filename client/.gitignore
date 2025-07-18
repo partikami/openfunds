@@ -133,3 +133,4 @@ dist
 
 # Some files
 "versionHelper(extendedOriginal).js"
+"Dockerfile copy"

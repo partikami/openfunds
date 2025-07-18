@@ -23,6 +23,8 @@ services:
     build:
       context: ./client
       target: production
+      args:
+        - VITE_API_BASE_URL=/api
     restart: unless-stopped
     networks:
       - openfunds-network
@@ -30,8 +32,6 @@ services:
       - "3000:3000"
     depends_on:
       - server
-    environment:
-      VITE_API_BASE_URL: /api
 
 networks:
     openfunds-network:
