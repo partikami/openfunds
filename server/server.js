@@ -23,6 +23,7 @@ app.use(
       "https://of-client-c901ce91e892.herokuapp.com",
       "http://localhost:5173",
       "http://localhost:3000",
+      "http://192.168.15.12:3000",
     ],
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
