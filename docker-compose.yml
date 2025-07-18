@@ -5,8 +5,6 @@ services:
       context: ./server
       target: production
     restart: unless-stopped
-    # Excluded from the build for portainer
-    # env_file: ./server/config.env
     networks:
       - openfunds-network
     ports:
