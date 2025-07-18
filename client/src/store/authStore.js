@@ -17,7 +17,7 @@ export const useAuthStore = create((set) => ({
   signup: async (email, password, name) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/signup`, {
+      const response = await axios.post(`${API_BASE_URL}/auth/signup`, {
         email,
         password,
         name,
@@ -39,7 +39,7 @@ export const useAuthStore = create((set) => ({
   login: async (email, password, name) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, {
         email,
         password,
         name,
@@ -62,7 +62,7 @@ export const useAuthStore = create((set) => ({
   logout: async () => {
     set({ isLoading: true, error: null });
     try {
-      await axios.post(`${API_BASE_URL}/api/auth/logout`);
+      await axios.post(`${API_BASE_URL}/auth/logout`);
       set({
         user: null,
         isAuthenticated: false,
@@ -81,7 +81,7 @@ export const useAuthStore = create((set) => ({
   verifyEmail: async (code) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/verify`, {
+      const response = await axios.post(`${API_BASE_URL}/auth/verify`, {
         code,
       });
       set({
@@ -103,7 +103,7 @@ export const useAuthStore = create((set) => ({
     set({ isLoading: true, error: null, message: null });
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/api/auth/forgot-password`,
+        `${API_BASE_URL}/auth/forgot-password`,
         {
           email,
         }
@@ -126,7 +126,7 @@ export const useAuthStore = create((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/api/auth/reset-password/${token}`,
+        `${API_BASE_URL}/auth/reset-password/${token}`,
         {
           password,
         }
@@ -148,7 +148,7 @@ export const useAuthStore = create((set) => ({
   resendVerificationEmail: async (email) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/resend`, {
+      const response = await axios.post(`${API_BASE_URL}/auth/resend`, {
         email,
       });
       set({
@@ -170,7 +170,7 @@ export const useAuthStore = create((set) => ({
   checkAuth: async () => {
     set({ isCheckingAuth: true, error: null });
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/auth/check-auth`);
+      const response = await axios.get(`${API_BASE_URL}/auth/check-auth`);
 
       if (response.data.success) {
         set({

@@ -5,7 +5,7 @@ const API_BASE_URL =
 
 export async function loader({ request, params }) {
   const id = params.id;
-  const response = await fetch(`${API_BASE_URL}/api/record/${id}`);
+  const response = await fetch(`${API_BASE_URL}/record/${id}`);
 
   // Uncomment in production environment. Comment out in localhost environment.
   /* export async function loader({ request, params }) {

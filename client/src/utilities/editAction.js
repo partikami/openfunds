@@ -29,13 +29,13 @@ export async function action({ request, params }) {
   };
 
   // Change the URL based on host
-  let url = `${API_BASE_URL}/api/record`;
+  let url = `${API_BASE_URL}/record`;
   // let url = "https://of-server-87a56a44565e.herokuapp.com/record";
 
   // Change the URL based on host
   if (method === "PATCH") {
     const id = params.id;
-    url = `${API_BASE_URL}/api/record/${id}`;
+    url = `${API_BASE_URL}/record/${id}`;
     // url = "https://of-server-87a56a44565e.herokuapp.com/record/" + id;
   }
 

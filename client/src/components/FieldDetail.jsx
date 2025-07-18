@@ -221,7 +221,7 @@ export default function FieldDetail({ method, field }) {
               className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
             >
               <img
-                src={`${API_BASE_URL}/api/uploads/${field.uploadedFile}`}
+                src={`${API_BASE_URL}/uploads/${field.uploadedFile}`}
                 alt={field.uploadedFile}
                 className="max-w-full h-auto"
               />

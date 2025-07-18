@@ -162,11 +162,11 @@ const ToolsPage = () => {
     }
 
     // Set the URL based on the selected file format
-    let url = `${API_BASE_URL}/api/import/import-json`;
+    let url = `${API_BASE_URL}/import/import-json`;
     if (importFileFormat === "csv") {
-      url = `${API_BASE_URL}/api/import/import-csv`;
+      url = `${API_BASE_URL}/import/import-csv`;
     } else if (importFileFormat === "xlsx") {
-      url = `${API_BASE_URL}/api/import/import-xlsx`;
+      url = `${API_BASE_URL}/import/import-xlsx`;
     }
 
     const formData = new FormData();
@@ -243,7 +243,7 @@ const ToolsPage = () => {
   };
 
   const handleExport = async () => {
-    let url = `${API_BASE_URL}/api/export/exportFile`;
+    let url = `${API_BASE_URL}/export/exportFile`;
 
     // Make the API call for export
     try {
