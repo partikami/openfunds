@@ -26,6 +26,7 @@ const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS
       "http://localhost:3000", // For local dev of frontend
       "http://localhost:5173", // Vite's default dev port
       "http://192.168.15.18",
+      "https://openfunds.ipartin.com", // Production domain
     ];
 
 app.use(

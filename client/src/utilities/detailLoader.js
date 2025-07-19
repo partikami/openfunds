@@ -7,13 +7,6 @@ export async function loader({ request, params }) {
   const id = params.id;
   const response = await fetch(`${API_BASE_URL}/record/${id}`);
 
-  // Uncomment in production environment. Comment out in localhost environment.
-  /* export async function loader({ request, params }) {
-  const id = params.id;
-  const response = await fetch(
-    "https://of-server-87a56a44565e.herokuapp.com/record/" + id
-  ); */
-
   if (!response.ok) {
     throw new Response(JSON.stringify({ message: "Could not fetch data." }), {
       status: 500,
