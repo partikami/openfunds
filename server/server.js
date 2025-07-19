@@ -17,19 +17,35 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Get allowed origins from environment variable
+// Remember to set this env var in your Portainer stack or docker-compose.yml
+// Example: CORS_ALLOWED_ORIGINS=http://your-nas-ip,http://your-domain.com
+const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS
+  ? process.env.CORS_ALLOWED_ORIGINS.split(",")
+  : [
+      "http://localhost:3000", // For local dev of frontend
+      "http://localhost:5173", // Vite's default dev port
+      "http://dsm1.ipartin.com",
+      "http://192.168.15.12",
+      "http://client", // Internal Docker network name for the Nginx (client) container
+    ];
+
 app.use(
   cors({
-    origin: [
-      "https://of-client-c901ce91e892.herokuapp.com",
-      "http://localhost:4173",
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "http://192.168.15.12:3000",
-    ],
-    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type"],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (e.g., mobile apps, curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+        callback(new Error(msg), false);
+      }
+    },
+    credentials: true, // If you're using cookies or sessions
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"], // Explicitly list allowed methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Explicitly list allowed headers
     exposedHeaders: ["X-Exported-Count", "Content-Disposition"],
-    credentials: true,
   })
 );
 

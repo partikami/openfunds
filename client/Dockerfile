@@ -1,5 +1,5 @@
-# Development stage
-FROM node:24-alpine AS development
+# --- Stage 1: Build Frontend Assets ---
+FROM node:24-alpine AS build_stage
 
 WORKDIR /app
 
@@ -9,24 +9,21 @@ RUN npm ci
 
 COPY . .
 
-RUN npm run build
-
-CMD ["npm", "run", "dev"]
-
-# Production stage
-FROM node:24-alpine AS production
-
-WORKDIR /app
-
-COPY package*.json ./
-COPY .env.production ./
-
-RUN npm ci
-
-COPY . .
+ARG VITE_API_BASE_URL
 
 RUN npm run build
 
-RUN npm install -g serve
+# --- Stage 2: Serve Production Assets with Nginx ---
+FROM nginx:alpine AS production
 
-CMD ["serve", "-s", "dist", "-l", "3000"]
+COPY --from=build_stage /app/dist /usr/share/nginx/html
+
+# Copy your Nginx configuration file
+# This file will be created/updated below in the nginx/ directory
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose Nginx's default HTTP port
+EXPOSE 80
+
+# Command to start Nginx in the foreground
+CMD ["nginx", "-g", "daemon off;"]
