@@ -25,9 +25,7 @@ const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS
   : [
       "http://localhost:3000", // For local dev of frontend
       "http://localhost:5173", // Vite's default dev port
-      "http://dsm1.ipartin.com",
-      "http://192.168.15.12",
-      "http://client", // Internal Docker network name for the Nginx (client) container
+      "http://192.168.15.18",
     ];
 
 app.use(
