@@ -5,14 +5,8 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY vendor ./vendor
-
 RUN npm ci --omit=dev
-
 COPY . .
-
-RUN npm run build
-
-CMD ["npm", "run", "dev"]
 
 # --- Stage 2: Production Runtime ---
 FROM node:24-alpine AS production
@@ -39,6 +33,4 @@ COPY --from=build_stage /app/utils ./utils
 COPY vendor ./vendor
 
 EXPOSE 5050
-
-# Command to start your backend application
 CMD ["node", "server.js"]
