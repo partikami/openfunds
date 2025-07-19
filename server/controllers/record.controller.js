@@ -8,8 +8,10 @@ import Field from "../models/record.model.js";
 export const readAll = async (req, res) => {
   // let collection = await db.collection("records");
   // let collection = await connectDB.collection("records");
+  console.log("Fetching all records from the database");
   const result = await Field.find();
   res.status(200).send(result);
+  console.log("Fetched all records:", result.length);
 };
 
 // This creates a new record
