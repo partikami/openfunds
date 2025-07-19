@@ -27,9 +27,6 @@ COPY --from=build_stage /app/models ./models
 COPY --from=build_stage /app/routes ./routes
 COPY --from=build_stage /app/utils ./utils
 
-# COPY --from=build_stage /app/config ./config
-# COPY --from=build_stage /app/uploads ./uploads
-
 COPY vendor ./vendor
 
 EXPOSE 5050
