@@ -1,6 +1,3 @@
-// TODO - Add more filtering options
-// TODO - Add export functionality
-
 import {
   createColumnHelper,
   flexRender,
@@ -36,7 +33,7 @@ const RecordList = () => {
     globalFilter: useRecordStore.getState().currentFilter || "",
   });
 
-  // Memoize colums definition
+  // Memorize colums definition
   const columns = useMemo(
     () => [
       columnHelper.display({
@@ -151,7 +148,7 @@ const RecordList = () => {
     [isAuthenticated]
   );
 
-  // Memoize table instance
+  // Memorize table instance
   const table = useReactTable({
     data,
     columns,

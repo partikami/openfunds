@@ -1,6 +1,6 @@
 // This loader function collects all records from the backend
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5050"; // Fallback for local dev
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5050/api"; // Fallback for local dev
 
 export async function loader() {
   const response = await fetch(`${API_BASE_URL}/record/`);
