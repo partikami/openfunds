@@ -20,7 +20,7 @@ services:
     volumes:
       # Fix: Added absolute path on NAS
       # - server-uploads:/app/uploads
-      /volume1/@docker/volumes/openfunds_server-uploads/_data:/app/uploads
+      - /volume1/@docker/volumes/openfunds_server-uploads/_data:/app/uploads
 
   # Frontend Build Service (Purpose: just to build assets)
   client_build:
