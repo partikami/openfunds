@@ -18,11 +18,16 @@ import {
 const router = express.Router();
 
 // Configure multer with storage settings
+const UPLOADS_DIR =
+  process.env.NODE_ENV === "production"
+    ? "/app/uploads" // Absolute path for Docker
+    : path.join(__dirname, "../../uploads"); // Relative path for local development
+
+// Configure multer with storage settings
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // Fix for const uploadDir as the uploads were stored in a non persistent folder within the container
-    // const uploadDir = path.join(__dirname, "../../uploads");
-    const uploadDir = "/app/uploads"; // Use the absolute path inside the container where the volume is mounted
+    // Use the environment-aware path
+    const uploadDir = UPLOADS_DIR;
 
     // Create uploads directory if it doesn't exist
     if (!fs.existsSync(uploadDir)) {

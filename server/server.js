@@ -63,7 +63,13 @@ app.use("/api/import", importRoutes);
 app.use("/api/export", exportRoutes);
 
 app.use(express.static("public")); // serve static files from the public directory
-app.use("/api/uploads", express.static("uploads")); // serve static files from the uploads directory
+
+const uploadsPath =
+  process.env.NODE_ENV === "production"
+    ? "uploads" // In Docker, this resolves to /app/uploads
+    : path.join(__dirname, "../uploads"); // In local dev, this resolves to project-root/uploads
+
+app.use("/api/uploads", express.static(uploadsPath));
 
 // start the Express server
 app.listen(PORT, () => {

@@ -1,5 +1,5 @@
 import path from "path";
-// import { fileURLToPath } from "url";
+import { fileURLToPath } from "url";
 import csvParser from "csv-parser";
 import XLSX from "xlsx";
 import { set_fs } from "xlsx";
@@ -14,10 +14,15 @@ import fixObjectIds from "../utils/fixObjectIds.js";
 import saveUploadedFileAndRespond from "../utils/uploadImage.js";
 import splitTags from "../utils/splitTags.js";
 
-// Get the current directory name
-// Fix: Replaced with absolute paths /app/uploads
-// const __filename = fileURLToPath(import.meta.url);
-//const __dirname = path.dirname(__filename);
+// Get the current directory name for development path resolution
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Define the uploads directory based on the environment
+const UPLOADS_DIR =
+  process.env.NODE_ENV === "production"
+    ? "/app/uploads" // Absolute path for Docker
+    : path.join(__dirname, "../../uploads"); // Relative path for local development
 
 // Define the required fields for Openfund records
 const REQUIRED_FIELDS = ["ofid", "fieldName", "introduced"];
@@ -61,7 +66,9 @@ export async function importJSONFile(req, res) {
     }
 
     const fileName = req.file.filename;
-    const filePath = path.join("/app/uploads", fileName);
+    // Fix: Use absolute path inside the container where the volume is mounted
+    // const filePath = path.join(__dirname, "../../uploads", fileName);
+    const filePath = path.join(UPLOADS_DIR, fileName);
 
     const importOption = req.body.importOption || "deleteAllAndImport"; // Default import option
 
@@ -212,7 +219,7 @@ export async function importCSVFile(req, res) {
     }
 
     const fileName = req.file.filename;
-    const csvFilePath = path.join("/app/uploads", fileName);
+    const csvFilePath = path.join(UPLOADS_DIR, fileName);
 
     const csvData = [];
 
@@ -370,7 +377,7 @@ export async function importXLSXFile(req, res) {
     }
 
     const fileName = req.file.filename;
-    const xlsxFilePath = path.join("/app/uploads", fileName);
+    const xlsxFilePath = path.join(UPLOADS_DIR, fileName);
 
     const importOption = req.body.importOption || "deleteAllAndImport"; // Default import option
 

@@ -6,8 +6,9 @@ import { Link, Form, useNavigate } from "react-router";
 import { useAuthStore } from "../store/authStore";
 import { useRecordStore } from "../store/recordStore";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5050"; // Fallback for local dev
+const ASSET_BASE_URL = import.meta.env.DEV
+  ? "http://localhost:5050/api" // Absolute URL for local development server
+  : "/api"; // Relative URL for production (Docker)
 
 export default function FieldDetail({ method, field }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -221,7 +222,7 @@ export default function FieldDetail({ method, field }) {
               className={`appearance-none block w-full min-h-12 ${bgColor} text-gray-700 border border-gray-700 rounded py-3 px-4 mb-3 leading-tight`}
             >
               <img
-                src={`${API_BASE_URL}/uploads/${field.uploadedFile}`}
+                src={`${ASSET_BASE_URL}/uploads/${field.uploadedFile}`}
                 alt={field.uploadedFile}
                 className="max-w-full h-auto"
               />
