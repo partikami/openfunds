@@ -20,7 +20,10 @@ const router = express.Router();
 // Configure multer with storage settings
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadDir = path.join(__dirname, "../../uploads");
+    // Fix for const uploadDir as the uploads were stored in a non persistent folder within the container
+    // const uploadDir = path.join(__dirname, "../../uploads");
+    const uploadDir = path.join(__dirname, "/app/uploads");
+
     // Create uploads directory if it doesn't exist
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });

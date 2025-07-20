@@ -17,9 +17,10 @@ services:
       MAILTRAP_TOKEN: ${MAILTRAP_TOKEN}
       # Backend CORS: The NAS IP/Domain
       CORS_ORIGIN: "https://ipartin.com"
-
     volumes:
-      - server-uploads:/app/uploads
+      # Fix: Added absolute path on NAS
+      # - server-uploads:/app/uploads
+      /volume1/@docker/volumes/openfunds_server-uploads/_data:/app/uploads
 
   # Frontend Build Service (Purpose: just to build assets)
   client_build:
@@ -54,5 +55,6 @@ networks:
           gateway: 192.168.15.1
 
 volumes:
-  server-uploads:
+  # Fix: Commented out the previous volume definition
+  # server-uploads:
   client-dist: # Define the named volume for client build temporary output
