@@ -63,7 +63,7 @@ app.use("/api/import", importRoutes);
 app.use("/api/export", exportRoutes);
 
 app.use(express.static("public")); // serve static files from the public directory
-app.use("/api/uploads", express.static(path.join(__dirname, "../uploads"))); // serve static files from the uploads directory
+app.use("/api/uploads", express.static("uploads")); // serve static files from the uploads directory
 
 // start the Express server
 app.listen(PORT, () => {

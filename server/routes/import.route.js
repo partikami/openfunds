@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     // Fix for const uploadDir as the uploads were stored in a non persistent folder within the container
     // const uploadDir = path.join(__dirname, "../../uploads");
-    const uploadDir = path.join(__dirname, "/app/uploads");
+    const uploadDir = "/app/uploads"; // Use the absolute path inside the container where the volume is mounted
 
     // Create uploads directory if it doesn't exist
     if (!fs.existsSync(uploadDir)) {
