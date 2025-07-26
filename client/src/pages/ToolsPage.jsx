@@ -344,12 +344,12 @@ const ToolsPage = () => {
         delay={2}
       />
 
-      <div className="ml-10 mt-12 text-white relative z-10">
-        <h1 className="text-3xl text-white font-bold mb-5">
+      <div className="ml-0 lg:ml-10 mt-12 text-white relative z-10">
+        <h1 className="ml-4 text-3xl text-white font-bold mb-5">
           {isAuthenticated ? "Data Import and Export" : "Data Export"}
         </h1>
 
-        <div className="flex flex-col lg:flex-row items-start mb-8 gap-8 lg:min-h-[32rem]">
+        <div className="flex flex-col text-sm lg:text-base lg:flex-row items-start mb-8 gap-8 lg:min-h-[32rem]">
           {/* Import Options */}
           {isAuthenticated ? (
             <div className="flex flex-col p-5 h-full lg:min-h-[30rem] border border-gray-100 rounded-lg w-full max-w-xl bg-gradient-to-r from-cyan-700 to-cyan-800 text-white">
